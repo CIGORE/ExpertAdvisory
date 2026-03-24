@@ -1,0 +1,2863 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aegis Trader Pro — Institutional Trading Terminal</title>
+<style>
+/* ============================================================
+   AEGIS TRADER PRO — Design System
+   Font: IBM Plex Mono (monospace) + DM Sans (sans)
+   Theme: Deep obsidian dark, cyan-blue accent, semantic colors
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Core palette */
+  --bg-base:       #080c12;
+  --bg-surface:    #0d1420;
+  --bg-elevated:   #121c2e;
+  --bg-panel:      #0f1929;
+  --bg-hover:      #162136;
+  --bg-active:     #1a2a42;
+
+  /* Borders */
+  --border:        rgba(40, 80, 140, 0.28);
+  --border-bright: rgba(60, 120, 200, 0.45);
+  --border-accent: rgba(0, 200, 255, 0.3);
+
+  /* Text */
+  --text-primary:   #e8f0ff;
+  --text-secondary: #7d9cc4;
+  --text-muted:     #4a6080;
+  --text-dim:       #2d4060;
+
+  /* Accent */
+  --cyan:    #00c8ff;
+  --blue:    #3b82f6;
+  --green:   #00e676;
+  --yellow:  #ffd740;
+  --red:     #ff3d5a;
+  --orange:  #ff8c42;
+  --purple:  #9b59b6;
+
+  /* Semantic */
+  --profit:  #00e676;
+  --loss:    #ff3d5a;
+  --warning: #ffd740;
+  --neutral: #7d9cc4;
+
+  /* Sizes */
+  --sidebar-w:      220px;
+  --sidebar-w-col:  56px;
+  --header-h:       52px;
+  --radius:         6px;
+  --radius-lg:      10px;
+  --font-mono:      'IBM Plex Mono', 'Courier New', monospace;
+  --font-sans:      'DM Sans', system-ui, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg-base:       #eef2f8;
+  --bg-surface:    #f6f8fc;
+  --bg-elevated:   #ffffff;
+  --bg-panel:      #f0f4fa;
+  --bg-hover:      #e4ebf5;
+  --bg-active:     #dce7f5;
+  --border:        rgba(100, 140, 200, 0.22);
+  --border-bright: rgba(60, 100, 200, 0.35);
+  --border-accent: rgba(0, 150, 200, 0.3);
+  --text-primary:  #0d1c35;
+  --text-secondary:#3d5a80;
+  --text-muted:    #7090b0;
+  --text-dim:      #aac0d8;
+  --cyan:    #0096c8;
+  --blue:    #2563eb;
+  --green:   #00a050;
+  --yellow:  #c89000;
+  --red:     #e0002a;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
+
+/* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.22s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  z-index: 50;
+  overflow: hidden;
+}
+.sidebar.collapsed { width: var(--sidebar-w-col); }
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  height: var(--header-h);
+  min-width: 0;
+}
+.sidebar-logo-mark {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--blue) 100%);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-logo-mark svg { width: 16px; height: 16px; }
+.sidebar-logo-text {
+  display: flex; flex-direction: column;
+  opacity: 1; transition: opacity 0.15s;
+  white-space: nowrap; overflow: hidden;
+  min-width: 0;
+}
+.sidebar.collapsed .sidebar-logo-text { opacity: 0; pointer-events: none; }
+.sidebar-logo-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.sidebar-logo-sub {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--cyan);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+}
+.nav-section-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 10px 14px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.15s;
+}
+.sidebar.collapsed .nav-section-label { opacity: 0; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+  border-left: 2px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+}
+.nav-item:hover { background: var(--bg-hover); }
+.nav-item.active {
+  background: var(--bg-active);
+  border-left-color: var(--cyan);
+}
+.nav-item-icon {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+}
+.nav-item.active .nav-item-icon { color: var(--cyan); }
+.nav-item-icon svg { width: 15px; height: 15px; }
+.nav-item-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex: 1;
+  transition: opacity 0.15s;
+  min-width: 0;
+}
+.nav-item.active .nav-item-label { color: var(--text-primary); }
+.sidebar.collapsed .nav-item-label { opacity: 0; }
+.nav-item-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  background: var(--cyan);
+  color: #000;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.sidebar.collapsed .nav-item-badge { opacity: 0; }
+.nav-badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  padding: 10px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-collapse-btn {
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  font-size: 11px;
+  transition: all 0.12s;
+  overflow: hidden; white-space: nowrap;
+}
+.sidebar-collapse-btn:hover { background: var(--bg-hover); border-color: var(--border-bright); }
+.sidebar-collapse-btn svg { width: 13px; height: 13px; flex-shrink: 0; transition: transform 0.22s; }
+.sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
+.sidebar-collapse-btn span { transition: opacity 0.15s; }
+.sidebar.collapsed .sidebar-collapse-btn span { opacity: 0; }
+
+/* ============================================================
+   MAIN AREA
+   ============================================================ */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  height: var(--header-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  z-index: 40;
+}
+
+.header-page-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.header-divider {
+  width: 1px; height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.header-status-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.status-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 9px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.status-chip.live { border-color: rgba(0,230,118,0.4); color: var(--green); }
+.status-chip.warn { border-color: rgba(255,215,64,0.4); color: var(--yellow); }
+.status-chip.err  { border-color: rgba(255,61,90,0.4);  color: var(--red); }
+.pulse-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+.header-actions {
+  display: flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: var(--radius);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  transition: all 0.12s;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+.btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+.btn-start  { background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: var(--green); }
+.btn-start:hover { background: rgba(0,230,118,0.25); }
+.btn-pause  { background: rgba(255,215,64,0.12); border-color: rgba(255,215,64,0.35); color: var(--yellow); }
+.btn-pause:hover { background: rgba(255,215,64,0.22); }
+.btn-stop   { background: rgba(255,61,90,0.12); border-color: rgba(255,61,90,0.35); color: var(--red); }
+.btn-stop:hover { background: rgba(255,61,90,0.22); }
+.btn-ghost  { background: transparent; border-color: var(--border); color: var(--text-secondary); }
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-bright); }
+.btn-icon { padding: 5px; }
+
+.header-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ============================================================
+   CONTENT / PAGE AREA
+   ============================================================ */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Page sections - show/hide logic */
+.page { display: none; flex-direction: column; gap: 16px; }
+.page.active { display: flex; }
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex; align-items: center; gap: 7px;
+}
+.section-title::before {
+  content: '';
+  display: block;
+  width: 3px; height: 14px;
+  background: var(--cyan);
+  border-radius: 2px;
+}
+.section-actions { display: flex; gap: 6px; align-items: center; }
+
+/* ============================================================
+   SYSTEM OVERVIEW STRIP
+   ============================================================ */
+.system-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.overview-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent-color, var(--cyan));
+  opacity: 0.7;
+}
+.overview-card-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.overview-card-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex; align-items: center; gap: 6px;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.badge-green  { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+.badge-yellow { background: rgba(255,215,64,0.12); color: var(--yellow); border: 1px solid rgba(255,215,64,0.3); }
+.badge-red    { background: rgba(255,61,90,0.12);  color: var(--red);    border: 1px solid rgba(255,61,90,0.3); }
+.badge-blue   { background: rgba(59,130,246,0.15); color: var(--blue);   border: 1px solid rgba(59,130,246,0.3); }
+.badge-cyan   { background: rgba(0,200,255,0.12);  color: var(--cyan);   border: 1px solid rgba(0,200,255,0.3); }
+.badge-orange { background: rgba(255,140,66,0.12); color: var(--orange); border: 1px solid rgba(255,140,66,0.3); }
+
+/* ============================================================
+   METRIC CARDS GRID
+   ============================================================ */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+.metric-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  position: relative;
+  transition: border-color 0.15s;
+}
+.metric-card:hover { border-color: var(--border-bright); }
+.metric-card-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.metric-card-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.metric-card-value.profit { color: var(--profit); }
+.metric-card-value.loss   { color: var(--loss); }
+.metric-card-change {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex; align-items: center; gap: 4px;
+}
+.metric-card-change.up   { color: var(--profit); }
+.metric-card-change.down { color: var(--loss); }
+.metric-card-sub {
+  font-size: 9.5px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   PANEL (generic card)
+   ============================================================ */
+.panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex; align-items: center; gap: 7px;
+}
+.panel-body { padding: 14px 16px; }
+.panel-body.no-pad { padding: 0; }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.tbl-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+thead th {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-weight: 500;
+}
+tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--bg-hover); }
+
+.dir-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+.dir-buy  { background: rgba(0,230,118,0.15); color: var(--profit); }
+.dir-sell { background: rgba(255,61,90,0.12); color: var(--loss); }
+
+/* ============================================================
+   GRID HELPERS
+   ============================================================ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* ============================================================
+   EA CONTROL CENTER
+   ============================================================ */
+.ea-control-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.ea-btn-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ea-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.ea-btn svg { width: 16px; height: 16px; margin-bottom: 2px; }
+.ea-btn:hover { background: var(--bg-hover); border-color: var(--border-bright); color: var(--text-primary); }
+.ea-btn.ea-start  { border-color: rgba(0,230,118,0.3); color: var(--green); }
+.ea-btn.ea-start:hover { background: rgba(0,230,118,0.1); }
+.ea-btn.ea-pause  { border-color: rgba(255,215,64,0.3); color: var(--yellow); }
+.ea-btn.ea-pause:hover { background: rgba(255,215,64,0.08); }
+.ea-btn.ea-stop   { border-color: rgba(255,61,90,0.35); color: var(--red); }
+.ea-btn.ea-stop:hover { background: rgba(255,61,90,0.1); }
+.ea-btn.ea-safe   { border-color: rgba(0,200,255,0.3); color: var(--cyan); }
+.ea-btn.ea-safe:hover { background: rgba(0,200,255,0.08); }
+
+.ea-info-table td {
+  padding: 5px 0;
+  border-bottom: none;
+  font-size: 11px;
+}
+.ea-info-table td:first-child { color: var(--text-muted); width: 55%; }
+.ea-info-table td:last-child  { color: var(--text-primary); font-weight: 500; }
+
+/* ============================================================
+   RISK ENGINE
+   ============================================================ */
+.risk-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+.risk-row:last-child { border-bottom: none; }
+.risk-row-label { font-size: 11.5px; color: var(--text-secondary); flex: 1; }
+.risk-row-value { font-family: var(--font-mono); font-size: 11px; color: var(--text-primary); font-weight: 500; white-space: nowrap; }
+
+.progress-bar-wrap {
+  flex: 1; max-width: 80px;
+  height: 4px;
+  background: var(--bg-panel);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.fill-green  { background: var(--green); }
+.fill-yellow { background: var(--yellow); }
+.fill-red    { background: var(--red); }
+.fill-cyan   { background: var(--cyan); }
+
+/* ============================================================
+   LOG / JOURNAL
+   ============================================================ */
+.log-container {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  display: flex; flex-direction: column; gap: 2px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 10px;
+}
+.log-entry {
+  display: grid;
+  grid-template-columns: 90px 70px 1fr 60px;
+  gap: 8px;
+  align-items: start;
+  padding: 5px 6px;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+.log-entry:hover { background: var(--bg-hover); }
+.log-ts   { color: var(--text-dim); white-space: nowrap; }
+.log-sym  { color: var(--cyan); font-weight: 600; }
+.log-msg  { color: var(--text-secondary); }
+.log-sev  { text-align: right; }
+.log-sev-badge {
+  font-size: 8.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sev-info    { background: rgba(59,130,246,0.2); color: var(--blue); }
+.sev-warn    { background: rgba(255,215,64,0.2); color: var(--yellow); }
+.sev-ok      { background: rgba(0,230,118,0.15); color: var(--green); }
+.sev-block   { background: rgba(255,61,90,0.15); color: var(--red); }
+.sev-sys     { background: rgba(0,200,255,0.12); color: var(--cyan); }
+
+/* ============================================================
+   ALERTS
+   ============================================================ */
+.alert-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.alert-item:last-child { border-bottom: none; }
+.alert-item:hover { background: var(--bg-hover); }
+.alert-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.alert-icon svg { width: 13px; height: 13px; }
+.alert-content { flex: 1; min-width: 0; }
+.alert-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 1px; }
+.alert-desc  { font-size: 10.5px; color: var(--text-muted); }
+.alert-meta  { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-dim); white-space: nowrap; }
+
+.alert-item.critical .alert-icon { background: rgba(255,61,90,0.15); color: var(--red); }
+.alert-item.warn     .alert-icon { background: rgba(255,215,64,0.12); color: var(--yellow); }
+.alert-item.info     .alert-icon { background: rgba(59,130,246,0.12); color: var(--blue); }
+.alert-item.ok       .alert-icon { background: rgba(0,230,118,0.12); color: var(--green); }
+
+/* ============================================================
+   MARKET REGIME
+   ============================================================ */
+.regime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.regime-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.regime-symbol { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.regime-type   { font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; }
+.regime-stats  { display: flex; flex-direction: column; gap: 3px; }
+.regime-stat   { display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+.regime-stat-val { font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary); }
+
+/* ============================================================
+   AI REVIEW PANEL
+   ============================================================ */
+.ai-chat-area {
+  display: flex; flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 12px;
+}
+.ai-message {
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.ai-message.user { flex-direction: row-reverse; }
+.ai-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-bright);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px; font-weight: 700; color: var(--text-secondary);
+}
+.ai-bubble {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px 8px 8px 2px;
+  padding: 9px 12px;
+  max-width: 75%;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+.user-bubble {
+  background: rgba(0,200,255,0.1);
+  border: 1px solid var(--border-accent);
+  border-radius: 8px 8px 2px 8px;
+  padding: 9px 12px;
+  max-width: 75%;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+.ai-bubble-meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); margin-top: 5px; }
+
+.ai-quick-prompts {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+.ai-chip {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.ai-chip:hover { background: var(--bg-hover); border-color: var(--border-accent); color: var(--cyan); }
+
+.ai-input-area {
+  display: flex; gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+.ai-input {
+  flex: 1;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  font-size: 11.5px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.12s;
+}
+.ai-input:focus { border-color: var(--border-accent); }
+.ai-input::placeholder { color: var(--text-muted); }
+.btn-send {
+  background: var(--cyan);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  font-weight: 700;
+  font-size: 11px;
+  display: flex; align-items: center; gap: 4px;
+  transition: opacity 0.12s;
+}
+.btn-send:hover { opacity: 0.85; }
+.btn-send svg { width: 12px; height: 12px; }
+
+/* ============================================================
+   ANALYTICS
+   ============================================================ */
+.chart-placeholder {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  height: 120px;
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+  padding: 8px;
+  gap: 3px;
+}
+/* CSS equity curve */
+.eq-bar {
+  flex: 1;
+  background: linear-gradient(to top, rgba(0,200,255,0.6), rgba(0,200,255,0.2));
+  border-radius: 2px 2px 0 0;
+  min-height: 4px;
+}
+.bar-chart-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 80px;
+  padding: 0 6px;
+}
+.bar-item {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  min-height: 4px;
+}
+.bar-profit { background: rgba(0,230,118,0.6); }
+.bar-loss   { background: rgba(255,61,90,0.5); }
+
+/* ============================================================
+   BROKER STATUS
+   ============================================================ */
+.broker-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+.broker-stat {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+.broker-stat-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+.broker-stat-value { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+/* ============================================================
+   STRATEGY BUILDER
+   ============================================================ */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 11.5px; color: var(--text-secondary); }
+.toggle {
+  width: 32px; height: 17px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.toggle.on { background: rgba(0,200,255,0.25); border-color: var(--cyan); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 11px; height: 11px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: all 0.15s;
+}
+.toggle.on::after { left: calc(100% - 13px); background: var(--cyan); }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.chip {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-secondary);
+}
+.chip.active { background: rgba(0,200,255,0.12); border-color: var(--border-accent); color: var(--cyan); }
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+.settings-section { margin-bottom: 18px; }
+.settings-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-label { font-size: 12px; color: var(--text-secondary); flex: 1; }
+.settings-value { font-family: var(--font-mono); font-size: 11px; color: var(--text-primary); }
+.settings-input {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--text-primary);
+  outline: none;
+  width: 110px;
+  font-family: var(--font-mono);
+}
+.settings-input:focus { border-color: var(--border-accent); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1100px) {
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .ea-control-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .metrics-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .system-overview { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+@media (max-width: 768px) {
+  html { font-size: 12px; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; height: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1), width 0.25s;
+    width: var(--sidebar-w) !important;
+    z-index: 100;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.4);
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar-logo-text { opacity: 1 !important; }
+  .nav-item-label { opacity: 1 !important; }
+  .nav-item-badge { opacity: 1 !important; }
+  .nav-section-label { opacity: 1 !important; }
+  .sidebar-collapse-btn span { opacity: 1 !important; }
+  .sidebar-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+    display: none;
+  }
+  .sidebar-overlay.visible { display: block; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .content { padding: 12px; gap: 12px; }
+  .log-entry { grid-template-columns: 80px 1fr; }
+  .log-sym, .log-sev { display: none; }
+  .header-status-cluster .status-chip:nth-child(n+3) { display: none; }
+  .header-actions .btn:not(.btn-icon) span { display: none; }
+}
+@media (max-width: 480px) {
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+  .system-overview { grid-template-columns: 1fr 1fr; }
+  .regime-grid { grid-template-columns: 1fr; }
+  .broker-stat-grid { grid-template-columns: 1fr 1fr; }
+  .ea-btn-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ============================================================
+   MOBILE HEADER BURGER
+   ============================================================ */
+.burger-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  padding: 5px;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.burger-btn svg { width: 16px; height: 16px; }
+@media (max-width: 768px) { .burger-btn { display: flex; } }
+
+/* ============================================================
+   MISC UTILITIES
+   ============================================================ */
+.text-mono { font-family: var(--font-mono); }
+.text-profit { color: var(--profit); }
+.text-loss { color: var(--loss); }
+.text-warn { color: var(--warning); }
+.text-cyan { color: var(--cyan); }
+.text-muted { color: var(--text-muted); }
+.mt-4 { margin-top: 4px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.items-center { align-items: center; }
+.gap-8 { gap: 8px; }
+.font-bold { font-weight: 700; }
+.text-sm { font-size: 11px; }
+.live-blink {
+  animation: blink 1.4s steps(1) infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Scrollbar inside ai chat */
+.ai-chat-area::-webkit-scrollbar { width: 3px; }
+.log-container::-webkit-scrollbar { width: 3px; }
+
+/* Separator line */
+.sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* ============================================================
+   THEME TOGGLE TRANSITION
+   ============================================================ */
+* { transition: background-color 0.18s, border-color 0.18s, color 0.12s; }
+/* Exceptions: no transition on layout transitions */
+.sidebar, .sidebar-logo-text, .nav-item-label, .nav-item-badge,
+.sidebar-collapse-btn span, .nav-section-label { transition: all 0.22s; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar overlay for mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="shell">
+  <!-- ====================================================
+       SIDEBAR
+       ==================================================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">
+        <!-- Shield icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"/>
+        </svg>
+      </div>
+      <div class="sidebar-logo-text">
+        <span class="sidebar-logo-name">Aegis Trader</span>
+        <span class="sidebar-logo-sub">PRO v2.4.1</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-section-label">Core</div>
+      <div class="nav-item active" data-page="overview">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+        <span class="nav-item-label">Overview</span>
+        <span class="nav-badge-dot pulse-dot" style="color:var(--green)"></span>
+      </div>
+      <div class="nav-item" data-page="live">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <span class="nav-item-label">Live Dashboard</span>
+        <span class="nav-item-badge">LIVE</span>
+      </div>
+      <div class="nav-item" data-page="ea">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></span>
+        <span class="nav-item-label">EA Control</span>
+      </div>
+      <div class="nav-item" data-page="strategy">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/><line x1="12" y1="3" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21"/></svg></span>
+        <span class="nav-item-label">Strategy Builder</span>
+      </div>
+
+      <div class="nav-section-label">Risk & Market</div>
+      <div class="nav-item" data-page="risk">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span class="nav-item-label">Risk Engine</span>
+      </div>
+      <div class="nav-item" data-page="regime">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h2l3-9 4 18 3-9h2l3 6 2-6h1"/></svg></span>
+        <span class="nav-item-label">Market Regime</span>
+      </div>
+      <div class="nav-item" data-page="positions">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 5 5 12"/></svg></span>
+        <span class="nav-item-label">Positions</span>
+        <span class="nav-item-badge">4</span>
+      </div>
+
+      <div class="nav-section-label">Journal & Analytics</div>
+      <div class="nav-item" data-page="journal">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+        <span class="nav-item-label">Trade Journal</span>
+      </div>
+      <div class="nav-item" data-page="analytics">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="nav-item-label">Analytics</span>
+      </div>
+      <div class="nav-item" data-page="alerts">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+        <span class="nav-item-label">Alerts</span>
+        <span class="nav-item-badge" style="background:var(--red);color:#fff">3</span>
+      </div>
+
+      <div class="nav-section-label">System</div>
+      <div class="nav-item" data-page="broker">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+        <span class="nav-item-label">Broker Status</span>
+      </div>
+      <div class="nav-item" data-page="ai">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>
+        <span class="nav-item-label">AI Review</span>
+        <span class="nav-item-badge" style="background:rgba(0,200,255,0.2);color:var(--cyan);border:1px solid rgba(0,200,255,0.3)">β</span>
+      </div>
+      <div class="nav-item" data-page="settings">
+        <span class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/><circle cx="12" cy="12" r="6" stroke-dasharray="2 4"/></svg></span>
+        <span class="nav-item-label">Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-collapse-btn" id="collapseBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Collapse panel</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ====================================================
+       MAIN AREA
+       ==================================================== -->
+  <div class="main-area">
+    <!-- HEADER -->
+    <header class="header">
+      <button class="burger-btn" id="burgerBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="header-page-title" id="headerTitle">System Overview</span>
+      <div class="header-divider"></div>
+      <div class="header-status-cluster">
+        <div class="status-chip live"><span class="pulse-dot"></span>SYSTEM LIVE</div>
+        <div class="status-chip live" id="brokerChip"><span class="pulse-dot"></span>IC MARKETS</div>
+        <div class="status-chip live"><span class="pulse-dot"></span>FEED OK</div>
+        <div class="status-chip" id="sessionChip">LONDON–NY OVERLAP</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-start" id="btnStart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Start EA</span>
+        </button>
+        <button class="btn btn-pause">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <span>Pause</span>
+        </button>
+        <button class="btn btn-stop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          <span>E-Stop</span>
+        </button>
+        <div class="header-divider"></div>
+        <!-- Theme toggle -->
+        <button class="btn btn-ghost btn-icon" id="themeToggle" title="Toggle theme">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <div class="header-avatar">AT</div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content" id="mainContent">
+
+      <!-- ==========================================
+           PAGE: OVERVIEW
+           ========================================== -->
+      <div class="page active" id="page-overview">
+        <!-- System Overview Strip -->
+        <div>
+          <div class="section-header">
+            <span class="section-title">System Status</span>
+            <span class="text-mono text-muted text-sm" id="clockDisplay">--:--:-- UTC</span>
+          </div>
+          <div class="system-overview" id="systemOverview"></div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div>
+          <div class="section-header">
+            <span class="section-title">Account Metrics</span>
+            <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;">Refresh</button>
+          </div>
+          <div class="metrics-grid" id="metricsGrid"></div>
+        </div>
+
+        <!-- Two columns: Positions + Alerts -->
+        <div class="grid-2">
+          <!-- Live Positions Preview -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 5 5 12"/></svg>
+                Live Positions
+              </span>
+              <span class="badge badge-cyan">4 OPEN</span>
+            </div>
+            <div class="panel-body no-pad">
+              <div class="tbl-wrap">
+                <table id="positionTableOverview">
+                  <thead>
+                    <tr>
+                      <th>Symbol</th>
+                      <th>Dir</th>
+                      <th>Lot</th>
+                      <th>PnL</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="positionBodyOverview"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Alerts Preview -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Active Alerts
+              </span>
+              <span class="badge badge-red">3 CRITICAL</span>
+            </div>
+            <div id="alertPreviewList"></div>
+          </div>
+        </div>
+
+        <!-- Broker + Regime quick row -->
+        <div class="grid-3">
+          <!-- EA Quick Status -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">EA Quick Status</span>
+              <span class="badge badge-green live-blink">● ACTIVE</span>
+            </div>
+            <div class="panel-body">
+              <table class="ea-info-table">
+                <tbody id="eaQuickTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Market Regime Quick -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Regime Snapshot</span>
+            </div>
+            <div class="panel-body">
+              <div id="regimeSnapshot"></div>
+            </div>
+          </div>
+          <!-- Log Preview -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Recent Activity</span>
+            </div>
+            <div class="log-container" id="logPreview" style="max-height:160px;"></div>
+          </div>
+        </div>
+      </div><!-- /page-overview -->
+
+      <!-- ==========================================
+           PAGE: LIVE DASHBOARD
+           ========================================== -->
+      <div class="page" id="page-live">
+        <div class="section-header">
+          <span class="section-title">Live Dashboard</span>
+          <span class="badge badge-green live-blink">● REALTIME</span>
+        </div>
+        <div class="metrics-grid" id="metricsGridLive"></div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Open Positions — Full View</span>
+            <div class="section-actions">
+              <span class="badge badge-cyan" id="posCountLive">4 OPEN</span>
+              <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;">Close All</button>
+            </div>
+          </div>
+          <div class="panel-body no-pad">
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th><th>Symbol</th><th>Dir</th><th>Entry</th>
+                    <th>Current</th><th>SL</th><th>TP</th><th>Lots</th><th>PnL</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="positionBodyFull"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Execution Feed</span></div>
+            <div class="log-container" id="execLog" style="max-height:200px;"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Broker Latency</span></div>
+            <div class="panel-body">
+              <div class="broker-stat-grid" id="brokerStatMini"></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-live -->
+
+      <!-- ==========================================
+           PAGE: EA CONTROL
+           ========================================== -->
+      <div class="page" id="page-ea">
+        <div class="section-header">
+          <span class="section-title">EA Control Center</span>
+          <span class="badge badge-green live-blink">● ENGINE ACTIVE</span>
+        </div>
+        <div class="ea-control-grid">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Engine Commands</span></div>
+            <div class="panel-body">
+              <div class="ea-btn-grid">
+                <button class="ea-btn ea-start">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Start EA
+                </button>
+                <button class="ea-btn ea-pause">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  Pause EA
+                </button>
+                <button class="ea-btn ea-stop">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                  Stop EA
+                </button>
+                <button class="ea-btn ea-safe">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+                  Safe Mode
+                </button>
+                <button class="ea-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.1"/></svg>
+                  Reduce Risk
+                </button>
+                <button class="ea-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Close All
+                </button>
+                <button class="ea-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  Disable Sym
+                </button>
+                <button class="ea-btn ea-stop">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  Kill Switch
+                </button>
+              </div>
+              <div class="sep"></div>
+              <div style="padding:4px 0;">
+                <div class="risk-row">
+                  <span class="risk-row-label">Kill Switch Status</span>
+                  <span class="badge badge-green">ARMED — READY</span>
+                </div>
+                <div class="risk-row">
+                  <span class="risk-row-label">Restart Engine</span>
+                  <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;">Restart</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Engine Parameters</span></div>
+            <div class="panel-body">
+              <table class="ea-info-table">
+                <tbody id="eaParamTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Allowed Symbols</span></div>
+            <div class="panel-body">
+              <div class="chip-row" id="allowedSymbolsChips"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Consecutive Loss Monitor</span></div>
+            <div class="panel-body">
+              <div class="risk-row">
+                <span class="risk-row-label">Consecutive Losses (current)</span>
+                <span class="risk-row-value text-warn">2 / 5</span>
+              </div>
+              <div class="progress-bar-wrap" style="max-width:100%;margin-top:6px;height:6px;">
+                <div class="progress-bar-fill fill-yellow" style="width:40%"></div>
+              </div>
+              <div class="risk-row" style="margin-top:10px;">
+                <span class="risk-row-label">Auto-pause trigger</span>
+                <span class="risk-row-value">5 losses</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Reset on new session</span>
+                <span class="risk-row-value text-profit">Enabled</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-ea -->
+
+      <!-- ==========================================
+           PAGE: STRATEGY BUILDER
+           ========================================== -->
+      <div class="page" id="page-strategy">
+        <div class="section-header">
+          <span class="section-title">Strategy Builder</span>
+          <div class="section-actions">
+            <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;">New Strategy</button>
+            <button class="btn btn-start" style="font-size:10px;padding:3px 8px;">Deploy</button>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Strategy Configuration</span><span class="badge badge-cyan">ACTIVE</span></div>
+            <div class="panel-body">
+              <div class="settings-section">
+                <div class="settings-section-title">Identity</div>
+                <div class="settings-row">
+                  <span class="settings-label">Strategy Name</span>
+                  <input class="settings-input" value="Momentum Alpha v3">
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Strategy Type</span>
+                  <span class="settings-value text-cyan">Trend-Following</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Primary Timeframe</span>
+                  <span class="settings-value">H1</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Risk Profile</span>
+                  <span class="badge badge-yellow">Moderate</span>
+                </div>
+              </div>
+              <div class="settings-section">
+                <div class="settings-section-title">Entry Logic</div>
+                <div class="settings-row">
+                  <span class="settings-label">Primary Signal</span>
+                  <span class="settings-value">EMA 21/50 Cross + RSI confirm</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Confirmation</span>
+                  <span class="settings-value">ATR breakout filter</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Volume Filter</span>
+                  <span class="badge badge-green">Enabled</span>
+                </div>
+              </div>
+              <div class="settings-section">
+                <div class="settings-section-title">Exit Logic</div>
+                <div class="settings-row">
+                  <span class="settings-label">Take Profit</span>
+                  <span class="settings-value">Dynamic — 2.5R</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Stop Loss</span>
+                  <span class="settings-value">ATR × 1.5 below swing</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Trailing Stop</span>
+                  <span class="badge badge-cyan">Active</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Breakeven Move</span>
+                  <span class="settings-value">1R — Auto</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Filter Configuration</span></div>
+            <div class="panel-body">
+              <div class="settings-section">
+                <div class="settings-section-title">Market Filters</div>
+                <div class="toggle-row">
+                  <span class="toggle-label">Session Filter</span>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="chip-row" style="margin-bottom:10px;">
+                  <span class="chip active">London</span>
+                  <span class="chip active">New York</span>
+                  <span class="chip">Tokyo</span>
+                  <span class="chip">Sydney</span>
+                </div>
+                <div class="toggle-row">
+                  <span class="toggle-label">Spread Guard</span>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Max Spread (pips)</span>
+                  <input class="settings-input" value="2.5">
+                </div>
+                <div class="toggle-row">
+                  <span class="toggle-label">Volatility Filter (ATR)</span>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Min ATR (pips)</span>
+                  <input class="settings-input" value="8">
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">Max ATR (pips)</span>
+                  <input class="settings-input" value="45">
+                </div>
+                <div class="toggle-row">
+                  <span class="toggle-label">News Event Block</span>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="toggle-row">
+                  <span class="toggle-label">Correlation Guard</span>
+                  <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                </div>
+              </div>
+              <div class="settings-section">
+                <div class="settings-section-title">Target Symbols</div>
+                <div class="chip-row" id="strategySymbolChips">
+                  <span class="chip active">XAUUSD</span>
+                  <span class="chip active">EURUSD</span>
+                  <span class="chip active">GBPUSD</span>
+                  <span class="chip active">USDJPY</span>
+                  <span class="chip">BTCUSD</span>
+                  <span class="chip">GBPJPY</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-strategy -->
+
+      <!-- ==========================================
+           PAGE: RISK ENGINE
+           ========================================== -->
+      <div class="page" id="page-risk">
+        <div class="section-header">
+          <span class="section-title">Risk Engine</span>
+          <span class="badge badge-yellow">MODERATE PROTECTION</span>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Loss Limits</span></div>
+            <div class="panel-body" id="riskLossPanel"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Exposure Control</span></div>
+            <div class="panel-body" id="riskExposurePanel"></div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Capital Preservation</span></div>
+            <div class="panel-body">
+              <div class="risk-row">
+                <span class="risk-row-label">Capital Preservation Mode</span>
+                <span class="badge badge-green">ACTIVE</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Stop After N Losses</span>
+                <span class="risk-row-value">5 consecutive</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Reset Period</span>
+                <span class="risk-row-value">Daily 00:00 UTC</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Equity High-Water Mark</span>
+                <span class="risk-row-value text-profit">$53,820.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Kill Switch</span></div>
+            <div class="panel-body">
+              <div class="risk-row">
+                <span class="risk-row-label">Status</span>
+                <span class="badge badge-green">ARMED</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Trigger: DD %</span>
+                <span class="risk-row-value">10%</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Trigger: Daily Loss</span>
+                <span class="risk-row-value">$1,200</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Action on trigger</span>
+                <span class="risk-row-value">Close All + Halt</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Correlation Control</span></div>
+            <div class="panel-body">
+              <div class="risk-row">
+                <span class="risk-row-label">Correlation Check</span>
+                <span class="badge badge-cyan">ENABLED</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Max Corr. Exposure</span>
+                <span class="risk-row-value">3 correlated lots</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">XAUUSD + EURUSD</span>
+                <span class="badge badge-yellow">WATCH</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">GBPUSD + EURUSD</span>
+                <span class="badge badge-red">HIGH CORR</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-risk -->
+
+      <!-- ==========================================
+           PAGE: MARKET REGIME
+           ========================================== -->
+      <div class="page" id="page-regime">
+        <div class="section-header">
+          <span class="section-title">Market Regime Monitor</span>
+          <span class="text-mono text-muted text-sm" id="regimeTimestamp">Updated 14:32:07 UTC</span>
+        </div>
+        <div class="regime-grid" id="regimeGrid"></div>
+        <div class="panel" style="margin-top:4px;">
+          <div class="panel-header"><span class="panel-title">Regime Decision Log</span></div>
+          <div class="log-container" id="regimeLog" style="max-height:200px;"></div>
+        </div>
+      </div><!-- /page-regime -->
+
+      <!-- ==========================================
+           PAGE: POSITIONS
+           ========================================== -->
+      <div class="page" id="page-positions">
+        <div class="section-header">
+          <span class="section-title">Open Positions</span>
+          <div class="section-actions">
+            <span class="badge badge-cyan">4 OPEN</span>
+            <button class="btn btn-stop" style="font-size:10px;padding:3px 8px;">Close All</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-body no-pad">
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th><th>Symbol</th><th>Dir</th><th>Open Time</th>
+                    <th>Entry</th><th>Current</th><th>SL</th><th>TP</th>
+                    <th>Lots</th><th>Swap</th><th>PnL USD</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="positionBodyDetailed"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="grid-3" style="margin-top:0">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Exposure Summary</span></div>
+            <div class="panel-body" id="exposureSummary"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Floating PnL Breakdown</span></div>
+            <div class="panel-body" id="floatBreakdown"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Risk per Position</span></div>
+            <div class="panel-body" id="riskPerPos"></div>
+          </div>
+        </div>
+      </div><!-- /page-positions -->
+
+      <!-- ==========================================
+           PAGE: TRADE JOURNAL
+           ========================================== -->
+      <div class="page" id="page-journal">
+        <div class="section-header">
+          <span class="section-title">Trade Journal & System Logs</span>
+          <div class="section-actions">
+            <select style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text-secondary);font-size:10.5px;padding:3px 7px;border-radius:4px;outline:none;" id="logFilter">
+              <option value="all">All Events</option>
+              <option value="trade">Trades Only</option>
+              <option value="signal">Signals</option>
+              <option value="risk">Risk Events</option>
+              <option value="system">System</option>
+            </select>
+            <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;">Export CSV</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Activity Log</span><span class="text-mono text-muted" style="font-size:9px;">Showing recent 50 events</span></div>
+          <div class="log-container" id="journalLog" style="max-height:500px;"></div>
+        </div>
+      </div><!-- /page-journal -->
+
+      <!-- ==========================================
+           PAGE: ANALYTICS
+           ========================================== -->
+      <div class="page" id="page-analytics">
+        <div class="section-header">
+          <span class="section-title">Performance Analytics</span>
+          <span class="text-mono text-muted text-sm">Period: MTD · Mar 2025</span>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Equity Curve (MTD)</span></div>
+            <div class="panel-body">
+              <div class="chart-placeholder" id="equityCurveChart" style="height:130px;"></div>
+              <div class="flex gap-8 items-center" style="margin-top:8px;font-family:var(--font-mono);font-size:9.5px;color:var(--text-muted);">
+                <span>Start: $48,500</span>
+                <span style="flex:1;text-align:center;color:var(--profit)">Peak: $53,820</span>
+                <span>Current: $52,341.87</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Win/Loss Distribution</span></div>
+            <div class="panel-body">
+              <div class="bar-chart-wrap" id="winLossChart"></div>
+              <div class="flex gap-8 items-center" style="margin-top:8px;font-size:9.5px;font-family:var(--font-mono);">
+                <span style="color:var(--profit)">■ Wins</span>
+                <span style="color:var(--loss)">■ Losses</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">By Symbol</span></div>
+            <div class="panel-body" id="perfBySymbol"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">By Session</span></div>
+            <div class="panel-body" id="perfBySession"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Drawdown Summary</span></div>
+            <div class="panel-body" id="drawdownSummary"></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Trade Frequency</span></div>
+            <div class="panel-body" id="tradeFreq"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Live vs Backtest Snapshot</span></div>
+            <div class="panel-body" id="liveVsBack"></div>
+          </div>
+        </div>
+      </div><!-- /page-analytics -->
+
+      <!-- ==========================================
+           PAGE: ALERTS
+           ========================================== -->
+      <div class="page" id="page-alerts">
+        <div class="section-header">
+          <span class="section-title">Alerts Center</span>
+          <div class="section-actions">
+            <span class="badge badge-red">3 CRITICAL</span>
+            <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;">Mark All Read</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div id="alertListFull"></div>
+        </div>
+      </div><!-- /page-alerts -->
+
+      <!-- ==========================================
+           PAGE: BROKER STATUS
+           ========================================== -->
+      <div class="page" id="page-broker">
+        <div class="section-header">
+          <span class="section-title">Broker & Execution Status</span>
+          <span class="badge badge-green live-blink">● CONNECTED</span>
+        </div>
+        <div class="broker-stat-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));" id="brokerStatGrid"></div>
+        <div class="grid-2" style="margin-top:4px;">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Order Execution Log</span></div>
+            <div class="log-container" id="orderLog" style="max-height:280px;"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Feed Health</span></div>
+            <div class="panel-body" id="feedHealth"></div>
+          </div>
+        </div>
+      </div><!-- /page-broker -->
+
+      <!-- ==========================================
+           PAGE: AI REVIEW
+           ========================================== -->
+      <div class="page" id="page-ai">
+        <div class="section-header">
+          <span class="section-title">AI Review Assistant</span>
+          <div class="section-actions">
+            <span class="badge badge-cyan">ANTHROPIC CLAUDE</span>
+            <span class="badge badge-yellow">ADVISORY ONLY</span>
+          </div>
+        </div>
+        <!-- Disclaimer -->
+        <div style="background:rgba(255,215,64,0.07);border:1px solid rgba(255,215,64,0.25);border-radius:var(--radius);padding:9px 14px;font-size:10.5px;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:var(--yellow);">⚠ Advisory Notice:</strong> The AI Review Assistant provides analytical summaries and explanations for <em>review purposes only</em>. It does not place, modify, or close orders. All final trading decisions remain the sole responsibility of the operator.
+        </div>
+        <div class="grid-2">
+          <div class="panel" style="display:flex;flex-direction:column;">
+            <div class="panel-header">
+              <span class="panel-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Chat Session
+              </span>
+              <span class="badge badge-green">READY</span>
+            </div>
+            <div class="ai-chat-area" id="aiChatArea"></div>
+            <div class="ai-quick-prompts" id="aiQuickPrompts"></div>
+            <div class="ai-input-area">
+              <input type="text" class="ai-input" id="aiInput" placeholder="Ask about trades, drawdown, performance...">
+              <button class="btn-send" id="aiSend">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send
+              </button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Context Sources</span></div>
+            <div class="panel-body">
+              <div class="risk-row">
+                <span class="risk-row-label">Live Position Data</span>
+                <span class="badge badge-green">LINKED</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Trade Journal (30d)</span>
+                <span class="badge badge-green">LINKED</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Risk Engine State</span>
+                <span class="badge badge-green">LINKED</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Execution Logs</span>
+                <span class="badge badge-green">LINKED</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Backtest Baseline</span>
+                <span class="badge badge-yellow">PARTIAL</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Market News Feed</span>
+                <span class="badge badge-red">OFFLINE</span>
+              </div>
+              <div class="sep"></div>
+              <div class="risk-row">
+                <span class="risk-row-label">Model</span>
+                <span class="risk-row-value text-cyan">claude-sonnet-4</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Session Tokens Used</span>
+                <span class="risk-row-value">4,217 / 200,000</span>
+              </div>
+              <div class="risk-row">
+                <span class="risk-row-label">Confidence Mode</span>
+                <span class="risk-row-value">Analytical</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-ai -->
+
+      <!-- ==========================================
+           PAGE: SETTINGS
+           ========================================== -->
+      <div class="page" id="page-settings">
+        <div class="section-header">
+          <span class="section-title">System Settings</span>
+          <button class="btn btn-start" style="font-size:10px;padding:4px 10px;">Save Changes</button>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Broker Profile</span></div>
+            <div class="panel-body">
+              <div class="settings-section">
+                <div class="settings-section-title">Connection</div>
+                <div class="settings-row"><span class="settings-label">Broker</span><input class="settings-input" value="IC Markets"></div>
+                <div class="settings-row"><span class="settings-label">Account Type</span><span class="settings-value">ECN — Raw Spread</span></div>
+                <div class="settings-row"><span class="settings-label">Account Number</span><input class="settings-input" value="•••••4821"></div>
+                <div class="settings-row"><span class="settings-label">Server</span><input class="settings-input" value="ICMarketsSC-MT5-3"></div>
+                <div class="settings-row"><span class="settings-label">VPS Endpoint</span><input class="settings-input" value="192.168.x.x:8080"></div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Risk Profile</span></div>
+            <div class="panel-body">
+              <div class="settings-section">
+                <div class="settings-row"><span class="settings-label">Risk Mode</span><select class="settings-input"><option>Moderate</option><option>Conservative</option><option>Aggressive</option></select></div>
+                <div class="settings-row"><span class="settings-label">Risk per Trade (%)</span><input class="settings-input" value="1.0"></div>
+                <div class="settings-row"><span class="settings-label">Max Daily Loss ($)</span><input class="settings-input" value="1200"></div>
+                <div class="settings-row"><span class="settings-label">Max Weekly Loss ($)</span><input class="settings-input" value="3500"></div>
+                <div class="settings-row"><span class="settings-label">Max Drawdown (%)</span><input class="settings-input" value="10"></div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Notification Rules</span></div>
+            <div class="panel-body">
+              <div class="toggle-row"><span class="toggle-label">Telegram Alerts</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><span class="toggle-label">Email Digest (Daily)</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><span class="toggle-label">Push — Trade Entry</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><span class="toggle-label">Push — Risk Events</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><span class="toggle-label">Sound Alerts</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+              <div class="toggle-row"><span class="toggle-label">Drawdown Warning</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">System Guards</span></div>
+            <div class="panel-body">
+              <div class="settings-section">
+                <div class="settings-row"><span class="settings-label">Latency Guard (ms)</span><input class="settings-input" value="150"></div>
+                <div class="settings-row"><span class="settings-label">Slippage Guard (pips)</span><input class="settings-input" value="2.0"></div>
+                <div class="settings-row"><span class="settings-label">Spread Guard (pips)</span><input class="settings-input" value="2.5"></div>
+                <div class="settings-row"><span class="settings-label">Reconnect Interval (s)</span><input class="settings-input" value="30"></div>
+                <div class="settings-row"><span class="settings-label">Audit Log Retention</span><input class="settings-input" value="90 days"></div>
+                <div class="settings-row"><span class="settings-label">AI Assistant Access</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-settings -->
+
+    </main>
+  </div><!-- /main-area -->
+</div><!-- /shell -->
+
+<script>
+/* ============================================================
+   AEGIS TRADER PRO — Application Logic
+   Pure JS, no dependencies
+   ============================================================ */
+
+// ---- DATA STORE ----
+
+const DATA = {
+  account: {
+    balance:     52341.87,
+    equity:      53112.44,
+    floatPnl:     +770.57,
+    closedPnl:   +1841.87,
+    dailyPnl:     +312.20,
+    weeklyPnl:   +1124.55,
+    maxDD:         -5.2,
+    currentDD:     -1.4,
+    winRate:       63.4,
+    profitFactor:  1.87,
+    expectancy:    +48.30,
+    openPositions: 4
+  },
+
+  systemStatus: [
+    { label: 'EA Status',        value: 'Active',   badge: 'badge-green', accent: '#00e676' },
+    { label: 'Market Regime',    value: 'Trending', badge: 'badge-cyan',  accent: '#00c8ff' },
+    { label: 'Risk Mode',        value: 'Moderate', badge: 'badge-yellow',accent: '#ffd740' },
+    { label: 'System Health',    value: 'Healthy',  badge: 'badge-green', accent: '#00e676' },
+    { label: 'Last Execution',   value: '14:31:52', badge: '',            accent: '#3b82f6' },
+    { label: 'Active Symbols',   value: '4 / 6',    badge: '',            accent: '#9b59b6' }
+  ],
+
+  positions: [
+    { ticket: 10042, symbol: 'XAUUSD', dir: 'BUY',  open: '14:12:00', entry: 2318.45, current: 2324.80, sl: 2308.00, tp: 2340.00, lots: 0.20, swap: -0.80,  pnl: +127.00, status: 'MANAGED' },
+    { ticket: 10043, symbol: 'EURUSD', dir: 'SELL', open: '14:18:30', entry: 1.08420, current: 1.08310, sl: 1.08650, tp: 1.08100, lots: 0.50, swap: +0.20,  pnl:  +55.00, status: 'ACTIVE'  },
+    { ticket: 10045, symbol: 'GBPUSD', dir: 'BUY',  open: '13:54:10', entry: 1.27340, current: 1.27280, sl: 1.27100, tp: 1.27700, lots: 0.30, swap: -0.40,  pnl:  -18.00, status: 'WATCH'   },
+    { ticket: 10046, symbol: 'USDJPY', dir: 'SELL', open: '12:40:00', entry: 149.820, current: 149.650, sl: 150.200, tp: 149.200, lots: 0.40, swap: +1.20,  pnl: +606.57, status: 'ACTIVE'  }
+  ],
+
+  alerts: [
+    { level: 'critical', title: 'Drawdown Warning',       desc: 'Current DD reached 1.4% — monitor closely. Trigger at 10%.', time: '14:30:12', icon: 'warn' },
+    { level: 'warn',     title: 'GBPUSD Spread Widening', desc: 'Spread now 3.1 pips — above threshold of 2.5 pips.', time: '14:28:55', icon: 'spread' },
+    { level: 'critical', title: 'GBPUSD Position at Risk', desc: 'Position #10045 floating -$18 with spread above guard. SL distance: 18 pips.', time: '14:22:40', icon: 'pos' },
+    { level: 'info',     title: 'Broker Reconnect',       desc: 'Feed momentarily interrupted at 13:47. Reconnected after 4s.', time: '13:47:04', icon: 'conn' },
+    { level: 'ok',       title: 'Breakeven Moved',        desc: 'XAUUSD #10042 SL moved to breakeven at 2318.45.', time: '13:35:20', icon: 'ok' },
+    { level: 'warn',     title: 'High Volatility Block',  desc: 'BTCUSD signal rejected — ATR 68 pips above max threshold (45).', time: '12:55:10', icon: 'vol' },
+    { level: 'info',     title: 'Market Regime Change',   desc: 'EURUSD regime updated: Range → Trending (London open momentum).', time: '09:02:18', icon: 'reg' }
+  ],
+
+  logs: [
+    { ts: '14:31:52', sym: 'USDJPY', msg: 'Signal confirmed — BUY rejected, existing SELL position active, skip',   sev: 'info' },
+    { ts: '14:30:12', sym: 'SYSTEM', msg: 'Drawdown monitor triggered — current DD: 1.4%',                          sev: 'warn' },
+    { ts: '14:28:55', sym: 'GBPUSD', msg: 'Spread guard: 3.1 pips detected — new entries blocked',                  sev: 'warn' },
+    { ts: '14:22:40', sym: 'GBPUSD', msg: 'Position #10045 entered soft watch — SL within 18 pips',                 sev: 'warn' },
+    { ts: '14:18:30', sym: 'EURUSD', msg: 'Trade opened — SELL 0.50 @ 1.08420 | SL: 1.08650 | TP: 1.08100',        sev: 'ok'   },
+    { ts: '14:12:00', sym: 'XAUUSD', msg: 'Trade opened — BUY 0.20 @ 2318.45 | SL: 2308.00 | TP: 2340.00',         sev: 'ok'   },
+    { ts: '13:47:04', sym: 'SYSTEM', msg: 'Broker feed interrupted — attempting reconnect...',                       sev: 'warn' },
+    { ts: '13:47:08', sym: 'SYSTEM', msg: 'Broker feed restored — latency: 28ms',                                   sev: 'sys'  },
+    { ts: '13:35:20', sym: 'XAUUSD', msg: 'SL moved to breakeven @ 2318.45 (1R protection)',                        sev: 'ok'   },
+    { ts: '12:55:10', sym: 'BTCUSD', msg: 'Signal rejected — ATR 68 pips, max allowed 45 pips',                     sev: 'block'},
+    { ts: '12:40:00', sym: 'USDJPY', msg: 'Trade opened — SELL 0.40 @ 149.820 | SL: 150.200 | TP: 149.200',         sev: 'ok'   },
+    { ts: '09:15:40', sym: 'SYSTEM', msg: 'EA engine started — strategy: Momentum Alpha v3',                         sev: 'sys'  },
+    { ts: '09:02:18', sym: 'EURUSD', msg: 'Market regime updated: Range → Trending (London open)',                   sev: 'info' },
+    { ts: '09:00:01', sym: 'SYSTEM', msg: 'Daily counters reset — loss tally: 0 | exposure cleared',                 sev: 'sys'  }
+  ],
+
+  regimes: [
+    { symbol: 'XAUUSD', regime: 'Volatile Trend', regimeBadge: 'badge-orange', spread: '1.8 pips', vol: 'High (ATR 38)', session: 'London–NY', score: 72, allowed: true  },
+    { symbol: 'EURUSD', regime: 'Trending',        regimeBadge: 'badge-cyan',   spread: '0.6 pips', vol: 'Med (ATR 18)', session: 'London–NY', score: 88, allowed: true  },
+    { symbol: 'GBPUSD', regime: 'Range Breakout',  regimeBadge: 'badge-yellow', spread: '3.1 pips', vol: 'Med (ATR 22)', session: 'London',    score: 41, allowed: false },
+    { symbol: 'USDJPY', regime: 'Trending',        regimeBadge: 'badge-cyan',   spread: '0.9 pips', vol: 'Med (ATR 16)', session: 'London–NY', score: 84, allowed: true  },
+    { symbol: 'BTCUSD', regime: 'High Volatility', regimeBadge: 'badge-red',    spread: '22 pts',   vol: 'Very High',    session: '24h',       score: 12, allowed: false },
+    { symbol: 'GBPJPY', regime: 'Mixed',           regimeBadge: 'badge-yellow', spread: '2.2 pips', vol: 'Med (ATR 28)', session: 'London',    score: 55, allowed: true  }
+  ],
+
+  eaParams: [
+    ['Active Strategy',     'Momentum Alpha v3'],
+    ['Engine Version',      '2.4.1 (MT5)'],
+    ['Active Symbols',      'XAUUSD, EURUSD, USDJPY, GBPUSD'],
+    ['Max Global Trades',   '6'],
+    ['Max Lot per Symbol',  '1.00'],
+    ['Current Exposure',    '$1,200 (2.3%)'],
+    ['Consecutive Losses',  '2 / 5'],
+    ['Risk per Trade',      '1.0%'],
+    ['Session Active',      'London + NY'],
+    ['Last Signal',         '14:31:52 UTC'],
+    ['Kill Switch',         'Armed — Standby']
+  ],
+
+  brokerStats: [
+    { label: 'Connection',       value: 'CONNECTED',  color: 'var(--green)' },
+    { label: 'Ping (ms)',        value: '28ms',        color: 'var(--profit)' },
+    { label: 'Avg Slippage',     value: '0.4 pips',   color: 'var(--green)' },
+    { label: 'Spread Status',    value: 'WIDE × 1',   color: 'var(--yellow)' },
+    { label: 'Orders Today',     value: '6 sent',      color: 'var(--text-primary)' },
+    { label: 'Rejected Today',   value: '1',           color: 'var(--warning)' },
+    { label: 'Last Fill',        value: '14:18:30',   color: 'var(--text-primary)' },
+    { label: 'Reconnects',       value: '1',           color: 'var(--yellow)' }
+  ],
+
+  aiMessages: [
+    { role: 'assistant', text: 'Welcome to Aegis AI Review. I have access to your live positions, trade journal (30 days), and risk engine state. How can I assist your review today?', time: '14:20:00' },
+    { role: 'user',      text: 'Why was the BTCUSD signal rejected at 12:55?', time: '14:20:18' },
+    { role: 'assistant', text: 'The BTCUSD signal at 12:55 was rejected by the volatility filter. The detected ATR was 68 pips, exceeding your configured maximum of 45 pips. Additionally, market regime classification for BTCUSD was "High Volatility" with a suitability score of only 12/100. This is consistent with your strategy\'s mandate to avoid entries during extreme volatility expansions. No position was opened — this is expected and correct behavior.', time: '14:20:42' }
+  ],
+
+  aiChips: [
+    'Why was XAUUSD trade rejected?',
+    'Summarize today\'s drawdown drivers',
+    'Compare live vs backtest performance',
+    'Explain recent slippage increase',
+    'Analyze GBPUSD losing streak',
+    'What is the current risk exposure?'
+  ],
+
+  riskLoss: [
+    { label: 'Risk per Trade',        value: '1.0%',      fill: 10,   color: 'fill-green'  },
+    { label: 'Daily Loss Used',       value: '$0 / $1,200',fill: 0,   color: 'fill-green'  },
+    { label: 'Weekly Loss Used',      value: '$376 / $3,500',fill:11, color: 'fill-green'  },
+    { label: 'Max Drawdown Limit',    value: '1.4% / 10%', fill:14,  color: 'fill-green'  },
+    { label: 'Loss Streak',           value: '2 / 5',      fill:40,  color: 'fill-yellow' }
+  ],
+
+  riskExposure: [
+    { label: 'Exposure per Symbol max', value: '$800',     fill: 0,  color: 'fill-green'  },
+    { label: 'XAUUSD Exposure',         value: '$640',     fill:80,  color: 'fill-yellow' },
+    { label: 'EURUSD Exposure',         value: '$540',     fill:68,  color: 'fill-yellow' },
+    { label: 'USDJPY Exposure',         value: '$424',     fill:53,  color: 'fill-green'  },
+    { label: 'GBPUSD Exposure',         value: '$320',     fill:40,  color: 'fill-green'  },
+    { label: 'Total Exposure',          value: '$1,924',   fill:38,  color: 'fill-green'  }
+  ]
+};
+
+// ---- RENDER HELPERS ----
+
+function formatPnl(val) {
+  const sign = val >= 0 ? '+' : '';
+  return sign + val.toFixed(2);
+}
+
+function pnlClass(val) { return val >= 0 ? 'text-profit' : 'text-loss'; }
+
+function renderBadge(cls, text) {
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+function renderDirBadge(dir) {
+  return `<span class="dir-badge dir-${dir.toLowerCase()}">${dir}</span>`;
+}
+
+function renderSevBadge(sev) {
+  const map = { info: 'sev-info', warn: 'sev-warn', ok: 'sev-ok', block: 'sev-block', sys: 'sev-sys' };
+  const labels = { info: 'INFO', warn: 'WARN', ok: 'OK', block: 'BLOCK', sys: 'SYS' };
+  return `<span class="log-sev-badge ${map[sev]||'sev-info'}">${labels[sev]||sev.toUpperCase()}</span>`;
+}
+
+// ---- RENDER FUNCTIONS ----
+
+function renderSystemOverview() {
+  const el = document.getElementById('systemOverview');
+  if (!el) return;
+  el.innerHTML = DATA.systemStatus.map(s => `
+    <div class="overview-card" style="--accent-color:${s.accent}">
+      <div class="overview-card-label">${s.label}</div>
+      <div class="overview-card-value">
+        ${s.value}
+        ${s.badge ? renderBadge(s.badge, s.value) : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMetricsGrid(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const a = DATA.account;
+  const metrics = [
+    { label: 'Balance',          value: '$' + a.balance.toLocaleString('en-US',{minimumFractionDigits:2}), cls: '', change: '', sub: 'USD account' },
+    { label: 'Equity',           value: '$' + a.equity.toLocaleString('en-US',{minimumFractionDigits:2}),  cls: '', change: '', sub: 'incl. floating' },
+    { label: 'Floating PnL',     value: formatPnl(a.floatPnl),     cls: pnlClass(a.floatPnl),     change: '', sub: '4 open positions' },
+    { label: 'Closed PnL (MTD)', value: '+$'+a.closedPnl.toFixed(2), cls:'text-profit', change:'', sub:'This month' },
+    { label: 'Daily PnL',        value: formatPnl(a.dailyPnl),     cls: pnlClass(a.dailyPnl),     change:'', sub:'Today' },
+    { label: 'Weekly PnL',       value: formatPnl(a.weeklyPnl),    cls: pnlClass(a.weeklyPnl),    change:'', sub:'Mon–now' },
+    { label: 'Max Drawdown',     value: a.maxDD+'%',                cls:'text-loss',                change:'', sub:'All-time' },
+    { label: 'Current Drawdown', value: a.currentDD+'%',            cls: a.currentDD < -5 ? 'text-loss' : a.currentDD < -2 ? 'text-warn' : 'text-profit', change:'', sub:'From equity peak' },
+    { label: 'Win Rate',         value: a.winRate+'%',              cls:'',                         change:'', sub:'MTD' },
+    { label: 'Profit Factor',    value: a.profitFactor.toFixed(2),  cls:a.profitFactor>1.5?'text-profit':'', change:'', sub:'MTD' },
+    { label: 'Expectancy',       value: '$'+a.expectancy.toFixed(2),cls:'text-profit',              change:'', sub:'Per trade avg' },
+    { label: 'Open Positions',   value: a.openPositions,            cls:'text-cyan',                change:'', sub:'Live now' }
+  ];
+  el.innerHTML = metrics.map(m => `
+    <div class="metric-card">
+      <div class="metric-card-label">${m.label}</div>
+      <div class="metric-card-value ${m.cls}">${m.value}</div>
+      <div class="metric-card-sub">${m.sub}</div>
+    </div>
+  `).join('');
+}
+
+function renderPositionRow(pos, compact = false) {
+  const pnlCls = pnlClass(pos.pnl);
+  const statusMap = { 'ACTIVE': 'badge-green', 'MANAGED': 'badge-cyan', 'WATCH': 'badge-yellow' };
+  if (compact) {
+    return `<tr>
+      <td class="text-cyan font-bold">${pos.symbol}</td>
+      <td>${renderDirBadge(pos.dir)}</td>
+      <td>${pos.lots}</td>
+      <td class="${pnlCls} font-bold">${formatPnl(pos.pnl)}</td>
+      <td>${renderBadge(statusMap[pos.status]||'badge-blue', pos.status)}</td>
+    </tr>`;
+  }
+  return `<tr>
+    <td class="text-mono text-muted">#${pos.ticket}</td>
+    <td class="text-cyan font-bold">${pos.symbol}</td>
+    <td>${renderDirBadge(pos.dir)}</td>
+    <td class="text-muted">${pos.open}</td>
+    <td>${pos.entry}</td>
+    <td>${pos.current}</td>
+    <td class="text-loss">${pos.sl}</td>
+    <td class="text-profit">${pos.tp}</td>
+    <td>${pos.lots}</td>
+    <td class="${pos.swap>=0?'text-profit':'text-loss'}">${pos.swap>=0?'+':''}${pos.swap.toFixed(2)}</td>
+    <td class="${pnlCls} font-bold">${formatPnl(pos.pnl)}</td>
+    <td>${renderBadge(statusMap[pos.status]||'badge-blue', pos.status)}</td>
+  </tr>`;
+}
+
+function renderPositions(targetId, compact = false) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = DATA.positions.map(p => renderPositionRow(p, compact)).join('');
+}
+
+function renderAlerts(targetId, limit = 999) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  el.innerHTML = DATA.alerts.slice(0, limit).map(a => `
+    <div class="alert-item ${a.level}">
+      <div class="alert-icon">${iconSvg}</div>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-desc">${a.desc}</div>
+      </div>
+      <div class="alert-meta">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+function renderLogs(targetId, limit = 999, filter = 'all') {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const filterMap = {
+    trade:  (l) => ['ok'].includes(l.sev) && l.msg.includes('Trade'),
+    signal: (l) => l.msg.includes('Signal') || l.msg.includes('signal'),
+    risk:   (l) => ['warn','block'].includes(l.sev),
+    system: (l) => l.sym === 'SYSTEM',
+    all:    ()  => true
+  };
+  const fn = filterMap[filter] || filterMap.all;
+  el.innerHTML = DATA.logs.filter(fn).slice(0, limit).map(l => `
+    <div class="log-entry">
+      <span class="log-ts">${l.ts}</span>
+      <span class="log-sym">${l.sym}</span>
+      <span class="log-msg">${l.msg}</span>
+      <span class="log-sev">${renderSevBadge(l.sev)}</span>
+    </div>
+  `).join('');
+}
+
+function renderRegimeGrid() {
+  const el = document.getElementById('regimeGrid');
+  if (!el) return;
+  el.innerHTML = DATA.regimes.map(r => `
+    <div class="regime-card">
+      <div class="regime-symbol">${r.symbol}</div>
+      <div class="regime-type">${renderBadge(r.regimeBadge, r.regime)}</div>
+      <div class="regime-stats">
+        <div class="regime-stat"><span>Spread</span><span class="regime-stat-val">${r.spread}</span></div>
+        <div class="regime-stat"><span>Volatility</span><span class="regime-stat-val">${r.vol}</span></div>
+        <div class="regime-stat"><span>Session</span><span class="regime-stat-val">${r.session}</span></div>
+        <div class="regime-stat"><span>Suitability</span><span class="regime-stat-val">${r.score}/100</span></div>
+        <div class="regime-stat" style="margin-top:6px;">
+          <span>Entry</span>
+          <span>${r.allowed ? renderBadge('badge-green','ALLOWED') : renderBadge('badge-red','BLOCKED')}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRegimeSnapshot() {
+  const el = document.getElementById('regimeSnapshot');
+  if (!el) return;
+  el.innerHTML = DATA.regimes.slice(0, 4).map(r => `
+    <div class="risk-row">
+      <span class="risk-row-label text-mono" style="font-size:10.5px;">${r.symbol}</span>
+      <span>${renderBadge(r.regimeBadge, r.regime)}</span>
+    </div>
+  `).join('');
+}
+
+function renderEaQuickTable() {
+  const el = document.getElementById('eaQuickTable');
+  if (!el) return;
+  el.innerHTML = DATA.eaParams.slice(0, 6).map(p => `
+    <tr><td>${p[0]}</td><td>${p[1]}</td></tr>
+  `).join('');
+}
+
+function renderEaParamTable() {
+  const el = document.getElementById('eaParamTable');
+  if (!el) return;
+  el.innerHTML = DATA.eaParams.map(p => `
+    <tr><td>${p[0]}</td><td>${p[1]}</td></tr>
+  `).join('');
+}
+
+function renderAllowedSymbols() {
+  const el = document.getElementById('allowedSymbolsChips');
+  if (!el) return;
+  const symbols = ['XAUUSD', 'EURUSD', 'GBPUSD', 'USDJPY', 'GBPJPY', 'BTCUSD'];
+  const active  = ['XAUUSD', 'EURUSD', 'GBPUSD', 'USDJPY'];
+  el.innerHTML = symbols.map(s =>
+    `<span class="chip ${active.includes(s)?'active':''}">${s}</span>`
+  ).join('');
+}
+
+function renderBrokerStats(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = DATA.brokerStats.map(s => `
+    <div class="broker-stat">
+      <div class="broker-stat-label">${s.label}</div>
+      <div class="broker-stat-value" style="color:${s.color}">${s.value}</div>
+    </div>
+  `).join('');
+}
+
+function renderRiskPanel(targetId, data) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = data.map(r => `
+    <div class="risk-row">
+      <span class="risk-row-label">${r.label}</span>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill ${r.color}" style="width:${r.fill}%"></div></div>
+      <span class="risk-row-value">${r.value}</span>
+    </div>
+  `).join('');
+}
+
+function renderEquityCurve() {
+  const el = document.getElementById('equityCurveChart');
+  if (!el) return;
+  const heights = [30,35,40,38,45,42,55,60,58,65,70,68,72,78,80,76,85,82,88,90,86,92,95,89,93,97,91,94,98,100];
+  el.innerHTML = heights.map(h =>
+    `<div class="eq-bar" style="height:${h}%"></div>`
+  ).join('');
+}
+
+function renderWinLossChart() {
+  const el = document.getElementById('winLossChart');
+  if (!el) return;
+  // Simulated daily win/loss bars
+  const days = [
+    {w:3,l:1},{w:5,l:2},{w:2,l:3},{w:6,l:1},{w:4,l:2},
+    {w:7,l:2},{w:3,l:4},{w:8,l:1},{w:5,l:2},{w:4,l:1}
+  ];
+  el.innerHTML = days.map(d => {
+    const wh = (d.w / 10) * 100;
+    const lh = (d.l / 10) * 100;
+    return `<div style="flex:1;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:flex-end;">
+      <div class="bar-item bar-profit" style="height:${wh}%"></div>
+      <div class="bar-item bar-loss" style="height:${lh}%"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderPerfBySymbol() {
+  const el = document.getElementById('perfBySymbol');
+  if (!el) return;
+  const data = [
+    { sym: 'XAUUSD', pnl: +640, trades: 18, wr: 72 },
+    { sym: 'EURUSD', pnl: +480, trades: 22, wr: 68 },
+    { sym: 'USDJPY', pnl: +560, trades: 14, wr: 71 },
+    { sym: 'GBPUSD', pnl:  -88, trades: 12, wr: 42 },
+    { sym: 'BTCUSD', pnl: +249, trades:  6, wr: 67 }
+  ];
+  el.innerHTML = data.map(d => `
+    <div class="risk-row">
+      <span class="risk-row-label font-bold text-mono">${d.sym}</span>
+      <span class="${pnlClass(d.pnl)} text-mono">${formatPnl(d.pnl)}</span>
+      <span class="badge ${d.wr>=60?'badge-green':d.wr>=50?'badge-yellow':'badge-red'}">${d.wr}%</span>
+    </div>
+  `).join('');
+}
+
+function renderPerfBySession() {
+  const el = document.getElementById('perfBySession');
+  if (!el) return;
+  const data = [
+    { sess: 'London',    pnl: +890, trades: 28 },
+    { sess: 'New York',  pnl: +640, trades: 22 },
+    { sess: 'L-NY Over', pnl: +480, trades: 14 },
+    { sess: 'Tokyo',     pnl:  -72, trades:  8 },
+    { sess: 'Sydney',    pnl:  -97, trades:  5 }
+  ];
+  el.innerHTML = data.map(d => `
+    <div class="risk-row">
+      <span class="risk-row-label">${d.sess}</span>
+      <span class="text-muted text-sm">${d.trades}tr</span>
+      <span class="${pnlClass(d.pnl)} text-mono">${formatPnl(d.pnl)}</span>
+    </div>
+  `).join('');
+}
+
+function renderDrawdownSummary() {
+  const el = document.getElementById('drawdownSummary');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="risk-row"><span class="risk-row-label">Max DD (all-time)</span><span class="risk-row-value text-loss">-5.2%</span></div>
+    <div class="risk-row"><span class="risk-row-label">Longest DD period</span><span class="risk-row-value">4 trading days</span></div>
+    <div class="risk-row"><span class="risk-row-label">Avg DD duration</span><span class="risk-row-value">1.8 days</span></div>
+    <div class="risk-row"><span class="risk-row-label">Current DD</span><span class="risk-row-value text-warn">-1.4%</span></div>
+    <div class="risk-row"><span class="risk-row-label">Recovery time (last)</span><span class="risk-row-value text-profit">3.2 days</span></div>
+  `;
+}
+
+function renderTradeFreq() {
+  const el = document.getElementById('tradeFreq');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="risk-row"><span class="risk-row-label">Avg trades/day</span><span class="risk-row-value">4.8</span></div>
+    <div class="risk-row"><span class="risk-row-label">Peak day</span><span class="risk-row-value">9 trades</span></div>
+    <div class="risk-row"><span class="risk-row-label">Signals today</span><span class="risk-row-value">7</span></div>
+    <div class="risk-row"><span class="risk-row-label">Accepted</span><span class="risk-row-value text-profit">6</span></div>
+    <div class="risk-row"><span class="risk-row-label">Rejected</span><span class="risk-row-value text-loss">1</span></div>
+    <div class="risk-row"><span class="risk-row-label">MTD total</span><span class="risk-row-value">72</span></div>
+  `;
+}
+
+function renderLiveVsBack() {
+  const el = document.getElementById('liveVsBack');
+  if (!el) return;
+  const rows = [
+    { label: 'Win Rate',       live: '63.4%', back: '61.8%', delta: '+1.6%', good: true },
+    { label: 'Profit Factor',  live: '1.87',  back: '2.04',  delta: '-0.17', good: false },
+    { label: 'Avg Trade PnL',  live: '$48',   back: '$52',   delta: '-$4',   good: false },
+    { label: 'Slippage cost',  live: '0.4p',  back: '0',     delta: '+0.4p', good: false },
+    { label: 'Max DD',         live: '-5.2%', back: '-6.1%', delta: '+0.9%', good: true }
+  ];
+  el.innerHTML = rows.map(r => `
+    <div class="risk-row">
+      <span class="risk-row-label">${r.label}</span>
+      <span class="text-mono" style="font-size:10px;color:var(--text-muted)">BT:${r.back}</span>
+      <span class="text-mono" style="font-size:10px;">${r.live}</span>
+      <span class="text-mono" style="font-size:10px;color:${r.good?'var(--profit)':'var(--loss)'};">${r.delta}</span>
+    </div>
+  `).join('');
+}
+
+function renderExposureSummary() {
+  const el = document.getElementById('exposureSummary');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="risk-row"><span class="risk-row-label">Total Open Lots</span><span class="risk-row-value">1.40</span></div>
+    <div class="risk-row"><span class="risk-row-label">Total Exposure</span><span class="risk-row-value">$1,924</span></div>
+    <div class="risk-row"><span class="risk-row-label">% of Equity</span><span class="risk-row-value text-warn">3.6%</span></div>
+    <div class="risk-row"><span class="risk-row-label">Symbols</span><span class="risk-row-value">4</span></div>
+  `;
+}
+
+function renderFloatBreakdown() {
+  const el = document.getElementById('floatBreakdown');
+  if (!el) return;
+  el.innerHTML = DATA.positions.map(p => `
+    <div class="risk-row">
+      <span class="risk-row-label text-mono">${p.symbol}</span>
+      <span class="${pnlClass(p.pnl)} text-mono">${formatPnl(p.pnl)}</span>
+    </div>
+  `).join('') + `
+    <div class="sep"></div>
+    <div class="risk-row"><span class="risk-row-label font-bold">Total Float</span>
+    <span class="text-profit text-mono font-bold">+$770.57</span></div>
+  `;
+}
+
+function renderRiskPerPos() {
+  const el = document.getElementById('riskPerPos');
+  if (!el) return;
+  el.innerHTML = DATA.positions.map(p => {
+    const risk = Math.abs(p.entry - p.sl) * p.lots * 100;
+    const riskat = risk.toFixed(0);
+    return `<div class="risk-row">
+      <span class="risk-row-label text-mono">${p.symbol}</span>
+      <span class="risk-row-value">$${riskat}</span>
+      <span class="badge ${risk>200?'badge-red':risk>100?'badge-yellow':'badge-green'}">${(risk/524*100).toFixed(0)}%R</span>
+    </div>`;
+  }).join('');
+}
+
+function renderBrokerStatGrid() {
+  const el = document.getElementById('brokerStatGrid');
+  if (!el) return;
+  el.innerHTML = DATA.brokerStats.map(s => `
+    <div class="broker-stat">
+      <div class="broker-stat-label">${s.label}</div>
+      <div class="broker-stat-value" style="color:${s.color}">${s.value}</div>
+    </div>
+  `).join('');
+}
+
+function renderFeedHealth() {
+  const el = document.getElementById('feedHealth');
+  if (!el) return;
+  const symbols = ['XAUUSD','EURUSD','GBPUSD','USDJPY','BTCUSD','GBPJPY'];
+  el.innerHTML = symbols.map(s => `
+    <div class="risk-row">
+      <span class="risk-row-label text-mono">${s}</span>
+      <div class="progress-bar-wrap" style="max-width:60px;"><div class="progress-bar-fill fill-green" style="width:100%"></div></div>
+      <span class="badge badge-green">LIVE</span>
+    </div>
+  `).join('');
+}
+
+function renderAiChat() {
+  const el = document.getElementById('aiChatArea');
+  if (!el) return;
+  el.innerHTML = DATA.aiMessages.map(m => {
+    if (m.role === 'assistant') {
+      return `<div class="ai-message">
+        <div class="ai-avatar">AI</div>
+        <div>
+          <div class="ai-bubble">${m.text}</div>
+          <div class="ai-bubble-meta">Aegis AI · ${m.time}</div>
+        </div>
+      </div>`;
+    } else {
+      return `<div class="ai-message user">
+        <div class="user-avatar">AT</div>
+        <div>
+          <div class="user-bubble">${m.text}</div>
+          <div class="ai-bubble-meta" style="text-align:right;">You · ${m.time}</div>
+        </div>
+      </div>`;
+    }
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderAiChips() {
+  const el = document.getElementById('aiQuickPrompts');
+  if (!el) return;
+  el.innerHTML = DATA.aiChips.map(c => `
+    <span class="ai-chip" onclick="sendAiPrompt('${c}')">${c}</span>
+  `).join('');
+}
+
+function renderOrderLog() {
+  const el = document.getElementById('orderLog');
+  if (!el) return;
+  const entries = DATA.logs.filter(l => l.sev === 'ok' || l.msg.includes('Trade') || l.msg.includes('SL moved'));
+  el.innerHTML = entries.map(l => `
+    <div class="log-entry">
+      <span class="log-ts">${l.ts}</span>
+      <span class="log-sym">${l.sym}</span>
+      <span class="log-msg">${l.msg}</span>
+      <span class="log-sev">${renderSevBadge(l.sev)}</span>
+    </div>
+  `).join('');
+}
+
+function renderRegimeLog() {
+  const el = document.getElementById('regimeLog');
+  if (!el) return;
+  const entries = [
+    { ts: '14:28:00', sym: 'GBPUSD', msg: 'Spread 3.1 pips — new entries blocked (guard: 2.5)', sev: 'warn' },
+    { ts: '14:00:00', sym: 'XAUUSD', msg: 'Regime: Volatile Trend confirmed — suitability: 72', sev: 'info' },
+    { ts: '13:00:00', sym: 'USDJPY', msg: 'Regime: Trending — entry allowed. Score: 84/100', sev: 'ok' },
+    { ts: '12:55:10', sym: 'BTCUSD', msg: 'Regime: High Volatility — entry blocked. Score: 12/100', sev: 'block' },
+    { ts: '09:02:18', sym: 'EURUSD', msg: 'Regime transition: Range → Trending (London open)', sev: 'sys' }
+  ];
+  el.innerHTML = entries.map(l => `
+    <div class="log-entry">
+      <span class="log-ts">${l.ts}</span>
+      <span class="log-sym">${l.sym}</span>
+      <span class="log-msg">${l.msg}</span>
+      <span class="log-sev">${renderSevBadge(l.sev)}</span>
+    </div>
+  `).join('');
+}
+
+function renderExecLog() {
+  const el = document.getElementById('execLog');
+  if (!el) return;
+  el.innerHTML = DATA.logs.map(l => `
+    <div class="log-entry">
+      <span class="log-ts">${l.ts}</span>
+      <span class="log-sym">${l.sym}</span>
+      <span class="log-msg">${l.msg}</span>
+      <span class="log-sev">${renderSevBadge(l.sev)}</span>
+    </div>
+  `).join('');
+}
+
+function renderBrokerStatMini() {
+  const el = document.getElementById('brokerStatMini');
+  if (!el) return;
+  el.innerHTML = DATA.brokerStats.map(s => `
+    <div class="broker-stat">
+      <div class="broker-stat-label">${s.label}</div>
+      <div class="broker-stat-value" style="color:${s.color}">${s.value}</div>
+    </div>
+  `).join('');
+}
+
+// ---- AI INTERACTION ----
+
+function sendAiPrompt(text) {
+  const input = document.getElementById('aiInput');
+  if (text) { input.value = text; }
+  const val = (input.value || '').trim();
+  if (!val) return;
+
+  const now = new Date();
+  const ts = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+
+  DATA.aiMessages.push({ role: 'user', text: val, time: ts });
+  input.value = '';
+
+  // Simulate AI response
+  const responses = {
+    default: 'Analyzing your query against current position data and journal... This is a prototype response. In production, this would call the Anthropic API with live trading context, returning a structured analytical summary relevant to your specific trade history and risk parameters.',
+    drawdown: 'Current drawdown of 1.4% is primarily driven by the GBPUSD position (#10045, -$18). The main contributing factor is the elevated spread (3.1 pips) widening effective entry price and reducing the cushion to SL. No systemic pattern — single position risk. Recommend monitoring GBPUSD spread normalization.',
+    slippage: 'Average slippage has risen to 0.4 pips from a 30-day baseline of 0.2 pips. Primary driver: the broker reconnect event at 13:47 coincided with 2 fills. Recommend reviewing latency logs for that window. Overall still within acceptable bounds.',
+    compare: 'Live performance is tracking within 8% of backtest projections. Slippage drag costs approximately $4 per trade vs backtest assumption. Profit factor is slightly below backtest (1.87 vs 2.04), which is within normal live/backtest variance. Win rate is slightly above backtest (+1.6%), indicating signal quality is holding.'
+  };
+
+  const lv = val.toLowerCase();
+  let resp = responses.default;
+  if (lv.includes('drawdown')) resp = responses.drawdown;
+  else if (lv.includes('slippage')) resp = responses.slippage;
+  else if (lv.includes('backtest') || lv.includes('live vs')) resp = responses.compare;
+
+  setTimeout(() => {
+    const ts2 = new Date();
+    const ts2s = ts2.getHours().toString().padStart(2,'0') + ':' + ts2.getMinutes().toString().padStart(2,'0') + ':' + ts2.getSeconds().toString().padStart(2,'0');
+    DATA.aiMessages.push({ role: 'assistant', text: resp, time: ts2s });
+    renderAiChat();
+  }, 900);
+
+  renderAiChat();
+}
+
+// ---- PAGE NAVIGATION ----
+
+const pageTitles = {
+  overview:  'System Overview',
+  live:      'Live Dashboard',
+  ea:        'EA Control Center',
+  strategy:  'Strategy Builder',
+  risk:      'Risk Engine',
+  regime:    'Market Regime Monitor',
+  positions: 'Open Positions',
+  journal:   'Trade Journal',
+  analytics: 'Performance Analytics',
+  alerts:    'Alerts Center',
+  broker:    'Broker & Execution Status',
+  ai:        'AI Review Assistant',
+  settings:  'System Settings'
+};
+
+function navigateTo(pageId) {
+  // Deactivate all
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+
+  // Activate target
+  const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+  if (navItem) navItem.classList.add('active');
+
+  const page = document.getElementById(`page-${pageId}`);
+  if (page) page.classList.add('active');
+
+  // Update header title
+  document.getElementById('headerTitle').textContent = pageTitles[pageId] || pageId;
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+}
+
+// ---- INIT ALL RENDERS ----
+
+function initAll() {
+  renderSystemOverview();
+  renderMetricsGrid('metricsGrid');
+  renderMetricsGrid('metricsGridLive');
+  renderPositions('positionBodyOverview', true);
+  renderPositions('positionBodyFull', false);
+  renderPositions('positionBodyDetailed', false);
+  renderAlerts('alertPreviewList', 3);
+  renderAlerts('alertListFull');
+  renderLogs('logPreview', 6);
+  renderLogs('journalLog');
+  renderLogs('execLog');
+  renderRegimeGrid();
+  renderRegimeSnapshot();
+  renderEaQuickTable();
+  renderEaParamTable();
+  renderAllowedSymbols();
+  renderBrokerStats('brokerStatMini');
+  renderBrokerStatGrid();
+  renderRiskPanel('riskLossPanel', DATA.riskLoss);
+  renderRiskPanel('riskExposurePanel', DATA.riskExposure);
+  renderEquityCurve();
+  renderWinLossChart();
+  renderPerfBySymbol();
+  renderPerfBySession();
+  renderDrawdownSummary();
+  renderTradeFreq();
+  renderLiveVsBack();
+  renderExposureSummary();
+  renderFloatBreakdown();
+  renderRiskPerPos();
+  renderAiChat();
+  renderAiChips();
+  renderOrderLog();
+  renderRegimeLog();
+  renderFeedHealth();
+}
+
+// ---- EVENT LISTENERS ----
+
+// Nav items
+document.getElementById('sidebarNav').addEventListener('click', function(e) {
+  const item = e.target.closest('.nav-item');
+  if (item && item.dataset.page) {
+    navigateTo(item.dataset.page);
+  }
+});
+
+// Sidebar collapse (desktop)
+document.getElementById('collapseBtn').addEventListener('click', function() {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+});
+
+// Mobile burger
+document.getElementById('burgerBtn').addEventListener('click', function() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sidebarOverlay').classList.add('visible');
+});
+
+// Overlay close
+document.getElementById('sidebarOverlay').addEventListener('click', function() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  this.classList.remove('visible');
+});
+
+// Theme toggle
+document.getElementById('themeToggle').addEventListener('click', function() {
+  const html = document.documentElement;
+  const isDark = html.dataset.theme === 'dark';
+  html.dataset.theme = isDark ? 'light' : 'dark';
+  // Swap icon
+  const icon = document.getElementById('themeIcon');
+  if (isDark) {
+    // Moon icon for light mode
+    icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  } else {
+    // Sun icon for dark mode
+    icon.innerHTML = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+  }
+});
+
+// Log filter
+const logFilter = document.getElementById('logFilter');
+if (logFilter) {
+  logFilter.addEventListener('change', function() {
+    renderLogs('journalLog', 999, this.value);
+  });
+}
+
+// AI input
+document.getElementById('aiSend').addEventListener('click', function() { sendAiPrompt(); });
+document.getElementById('aiInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') sendAiPrompt();
+});
+
+// EA buttons — visual feedback only
+document.querySelectorAll('.ea-btn, .btn-start, .btn-pause, .btn-stop').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.style.transform = 'scale(0.95)';
+    setTimeout(() => { this.style.transform = ''; }, 120);
+  });
+});
+
+// ---- LIVE CLOCK ----
+function updateClock() {
+  const now = new Date();
+  const h = now.getUTCHours().toString().padStart(2,'0');
+  const m = now.getUTCMinutes().toString().padStart(2,'0');
+  const s = now.getUTCSeconds().toString().padStart(2,'0');
+  const el = document.getElementById('clockDisplay');
+  if (el) el.textContent = `${h}:${m}:${s} UTC`;
+  const re = document.getElementById('regimeTimestamp');
+  if (re) re.textContent = `Updated ${h}:${m}:${s} UTC`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ---- SIMULATED LIVE UPDATES ----
+// Slightly vary floating PnL every 3 seconds for realism
+setInterval(function() {
+  DATA.positions.forEach(pos => {
+    const drift = (Math.random() - 0.48) * 5;
+    pos.pnl = Math.round((pos.pnl + drift) * 100) / 100;
+    if (pos.dir === 'BUY') {
+      pos.current = Math.round((pos.current + drift * 0.001) * 100000) / 100000;
+    } else {
+      pos.current = Math.round((pos.current - drift * 0.001) * 100000) / 100000;
+    }
+  });
+  // Update total float PnL
+  const totalFloat = DATA.positions.reduce((acc, p) => acc + p.pnl, 0);
+  DATA.account.floatPnl = Math.round(totalFloat * 100) / 100;
+  DATA.account.equity = DATA.account.balance + DATA.account.floatPnl;
+
+  // Re-render relevant areas if page visible
+  const active = document.querySelector('.page.active');
+  if (active) {
+    const id = active.id.replace('page-', '');
+    if (['overview','live','positions'].includes(id)) {
+      renderPositions('positionBodyOverview', true);
+      renderPositions('positionBodyFull', false);
+      renderPositions('positionBodyDetailed', false);
+      renderMetricsGrid('metricsGrid');
+      renderMetricsGrid('metricsGridLive');
+      renderFloatBreakdown();
+    }
+  }
+}, 3000);
+
+// ---- INIT ----
+initAll();
+</script>
+</body>
+</html>

@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Avoryn · Execution Supervision Platform</title>
+<title>Oqvara · Execution Supervision Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<!-- Inline favicon as SVG data URI -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect width='32' height='32' rx='7' fill='%23080c14'/%3E%3Cpath d='M24.5 8.5 A12 12 0 1 1 7.5 23.5' stroke='%2338bdf8' stroke-width='2.2' stroke-linecap='round' fill='none'/%3E%3Cpath d='M10 23 L16 9 L22 23' stroke='%23e4e9f2' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M12.4 18.2 H19.6' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<!-- Oqvara Favicon — Guard Ring OQ mark -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect width='32' height='32' rx='7' fill='%23080c14'/%3E%3Cpath d='M25 16 A9 9 0 1 0 16 25' stroke='%2338bdf8' stroke-width='2.2' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='16' cy='16' r='4.5' stroke='%2338bdf8' stroke-width='1.4' stroke-opacity='0.35' fill='none'/%3E%3Cpath d='M19 19 L23 23' stroke='%2338bdf8' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
 
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -54,10 +54,15 @@ body.light .sly.l3{background:rgba(5,150,105,.05);border-color:rgba(5,150,105,.1
 body.light .sly.l4{background:rgba(220,38,38,.05);border-color:rgba(220,38,38,.12);color:#dc2626}
 body.light .svb{color:#059669;background:rgba(5,150,105,.08)}
 body.light .sd.li{background:#059669;box-shadow:0 0 6px #059669}
-body.light .logo-svg-text{fill:#1a1f2e}
-body.light .logo-svg-arc{stroke:#2563eb}
-body.light .logo-svg-crossbar{stroke:#2563eb}
-body.light .logo-svg-dot{fill:#2563eb}
+body.light .oqv-arc{stroke:#2563eb}
+body.light .oqv-arc-inner{stroke:#2563eb}
+body.light .oqv-ring{stroke:#2563eb}
+body.light .oqv-tail{stroke:#2563eb}
+body.light .oqv-dot{fill:#2563eb}
+body.light .oqv-wordmark{fill:#1a1f2e}
+body.light .more-sheet{background:rgba(255,255,255,.98);border-color:rgba(60,80,120,.12)}
+body.light .more-sheet-item{background:var(--bg3);border-color:var(--b1)}
+body.light .more-sheet-item:hover{background:var(--bg3h)}
 
 /* THEME TOGGLE */
 .theme-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--b1);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr);position:relative;overflow:hidden;flex-shrink:0;padding:0}
@@ -69,23 +74,68 @@ body.light .theme-btn .sun-icon{opacity:1;transform:rotate(0) scale(1)}
 body.light .theme-btn .moon-icon{opacity:0;transform:rotate(90deg) scale(.5)}
 .theme-btn-mobile{display:none}
 
-/* MORE MENU OVERLAY */
-.more-overlay{display:none;position:fixed;inset:0;z-index:250;background:rgba(8,12,20,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:6px}
-.more-overlay.open{display:flex}
-body.light .more-overlay{background:rgba(245,247,250,.97)}
-.more-overlay a{display:flex;align-items:center;gap:12px;font-size:16px;font-weight:600;color:var(--t1);text-decoration:none;padding:14px 40px;border-radius:var(--rm);transition:var(--tr);width:280px}
-.more-overlay a:hover{background:var(--bg3);color:var(--ac)}
-.more-overlay a svg{width:20px;height:20px;flex-shrink:0;color:var(--ac)}
-.more-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--t1);cursor:pointer;padding:8px}
+/* MORE SHEET (compact bottom sheet instead of full overlay) */
+.more-sheet-backdrop{display:none;position:fixed;inset:0;z-index:240;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.more-sheet-backdrop.open{display:block}
+.more-sheet{display:none;position:fixed;bottom:68px;left:10px;right:10px;z-index:250;background:rgba(15,21,32,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(80,120,180,.12);border-radius:18px;padding:16px;box-shadow:0 -4px 32px rgba(0,0,0,.3);max-height:70vh;overflow-y:auto}
+.more-sheet.open{display:block;animation:sheetUp .28s ease-out}
+@keyframes sheetUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.more-sheet-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:12px;padding:0 4px}
+.more-sheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.more-sheet-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rm);text-decoration:none;color:var(--t1);font-size:11px;font-weight:600;text-align:center;transition:var(--tr);cursor:pointer;line-height:1.3}
+.more-sheet-item:hover,.more-sheet-item:active{border-color:var(--ac);background:var(--bg3h);color:var(--ac)}
+.more-sheet-item svg{width:20px;height:20px;color:var(--ac);flex-shrink:0}
+.more-sheet-divider{height:1px;background:var(--b1);margin:12px 0}
+.more-sheet-row{display:flex;gap:8px}
+.more-sheet-row .more-sheet-item{flex:1}
 
-/* FAB MENU */
-.fab-menu{position:fixed;bottom:140px;right:18px;z-index:202;display:flex;flex-direction:column;gap:10px;align-items:flex-end;pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .25s ease,transform .25s ease}
-.fab-menu.open{pointer-events:auto;opacity:1;transform:translateY(0)}
-.fab-item{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rm);box-shadow:var(--sh);font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;cursor:pointer;transition:var(--tr);text-decoration:none}
-.fab-item:hover{border-color:var(--ac);background:var(--bg3)}
-.fab-item svg{width:18px;height:18px;flex-shrink:0}
-.fab-item.danger{color:var(--r);border-color:rgba(248,113,113,.2)}
-.fab-item.danger:hover{background:var(--rd);border-color:var(--r)}
+/* SOCIAL FAB (replaces operator quick actions) */
+.social-fab-menu{position:fixed;bottom:86px;right:24px;z-index:202;display:flex;flex-direction:column;gap:10px;align-items:flex-end;pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .25s ease,transform .25s ease}
+.social-fab-menu.open{pointer-events:auto;opacity:1;transform:translateY(0)}
+.social-fab-item{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rm);box-shadow:var(--sh);font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;cursor:pointer;transition:var(--tr);text-decoration:none}
+.social-fab-item:hover{border-color:var(--ac);background:var(--bg3)}
+.social-fab-item svg{width:18px;height:18px;flex-shrink:0}
+.social-fab-item.wa{color:#25D366;border-color:rgba(37,211,102,.2)}
+.social-fab-item.wa:hover{background:rgba(37,211,102,.08);border-color:#25D366}
+.social-fab-item.tg2{color:#26A5E4;border-color:rgba(38,165,228,.2)}
+.social-fab-item.tg2:hover{background:rgba(38,165,228,.08);border-color:#26A5E4}
+.social-fab-item.email-fab{color:var(--ac);border-color:rgba(56,189,248,.2)}
+.social-fab-item.email-fab:hover{background:var(--acd);border-color:var(--ac)}
+.social-fab-item.ai-bot{color:var(--a2);border-color:rgba(129,140,248,.2);background:linear-gradient(135deg,rgba(129,140,248,.06),rgba(56,189,248,.06))}
+.social-fab-item.ai-bot:hover{background:linear-gradient(135deg,rgba(129,140,248,.12),rgba(56,189,248,.12));border-color:var(--a2)}
+.social-fab-item.ai-bot .ai-pulse{width:8px;height:8px;border-radius:50%;background:var(--a2);animation:pu 2s infinite;margin-left:auto}
+
+/* AI CHATBOT PANEL */
+.chat-panel{display:none;position:fixed;bottom:68px;right:10px;left:10px;z-index:260;max-width:420px;height:520px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rxl);box-shadow:var(--sh),0 0 60px rgba(56,189,248,.08);flex-direction:column;overflow:hidden}
+.chat-panel.open{display:flex;animation:sheetUp .3s ease-out}
+@media(min-width:769px){.chat-panel{bottom:24px;right:24px;left:auto;width:420px;max-width:420px;height:560px}}
+.chat-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--b1);flex-shrink:0;background:linear-gradient(135deg,rgba(129,140,248,.06),rgba(56,189,248,.04))}
+.chat-head-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--a2));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-head-avatar svg{width:18px;height:18px;color:#fff}
+.chat-head-info{flex:1}
+.chat-head-name{font-size:14px;font-weight:700;color:var(--t1)}
+.chat-head-status{font-size:11px;color:var(--g);display:flex;align-items:center;gap:4px}
+.chat-head-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g);animation:pu 2s infinite}
+.chat-close{background:none;border:none;color:var(--t3);cursor:pointer;padding:6px;border-radius:8px;transition:var(--tr)}.chat-close:hover{color:var(--t1);background:var(--bg3)}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.chat-messages::-webkit-scrollbar{width:4px}.chat-messages::-webkit-scrollbar-track{background:transparent}.chat-messages::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.6;word-wrap:break-word}
+.chat-msg.bot{align-self:flex-start;background:var(--bg3);border:1px solid var(--b1);color:var(--t1);border-bottom-left-radius:4px}
+.chat-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--ac),var(--a2));color:#fff;border-bottom-right-radius:4px}
+.chat-msg.typing{display:flex;align-items:center;gap:4px;padding:12px 18px}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:typingBounce 1.4s infinite ease-in-out}
+.typing-dot:nth-child(1){animation-delay:0s}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-input-area{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--b1);flex-shrink:0;background:var(--bg2)}
+.chat-input{flex:1;padding:10px 14px;background:var(--bgi);border:1.5px solid var(--bi);border-radius:var(--rf);color:var(--t1);font-family:var(--f);font-size:13px;outline:none;transition:border-color var(--tr);min-width:0}
+.chat-input:focus{border-color:var(--ac)}
+.chat-input::placeholder{color:var(--t3)}
+.chat-send{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--a2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr);flex-shrink:0}
+.chat-send:hover{transform:scale(1.05)}.chat-send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.chat-send svg{width:16px;height:16px;color:#fff}
+.chat-disclaimer{font-size:9px;color:var(--t3);text-align:center;padding:0 14px 8px;line-height:1.4}
 
 html{scroll-behavior:smooth}
 body{font-family:var(--f);background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
@@ -106,30 +156,22 @@ body.noscr{overflow:hidden}
 .tg{display:inline-flex;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
 .tb{background:var(--acd);color:var(--ac)}.tp{background:var(--a2d);color:var(--a2)}.tgr{background:var(--gd);color:var(--g)}
 
-/* LOGO SVG THEMING */
-.logo-svg-text{fill:#e4e9f2;transition:fill var(--tr)}
-.logo-svg-arc{stroke:#38bdf8;transition:stroke var(--tr)}
-.logo-svg-crossbar{stroke:#38bdf8;transition:stroke var(--tr)}
-.logo-svg-dot{fill:#38bdf8;transition:fill var(--tr)}
-.logo-svg-inner-arc{stroke:#38bdf8;stroke-opacity:.35;transition:stroke var(--tr)}
+/* OQVARA SVG MARK */
+.oqv-arc{stroke:#38bdf8;transition:stroke var(--tr)}
+.oqv-arc-inner{stroke:#38bdf8;stroke-opacity:.30;transition:stroke var(--tr)}
+.oqv-ring{stroke:#38bdf8;stroke-opacity:.55;transition:stroke var(--tr)}
+.oqv-tail{stroke:#38bdf8;transition:stroke var(--tr)}
+.oqv-dot{fill:#38bdf8;transition:fill var(--tr)}
+.oqv-wordmark{fill:#e4e9f2;transition:fill var(--tr)}
 
 /* NAV */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(8,12,20,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--b1)}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.5px;color:var(--t1);text-decoration:none}
-.lm{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--a2));display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.lm svg{width:16px;height:16px}
 .nl{display:flex;gap:28px}.nl a{font-size:13px;font-weight:500;color:var(--t2);text-decoration:none;transition:color var(--tr)}.nl a:hover{color:var(--ac)}
 .nr{display:flex;gap:10px;align-items:center}.nr .btn{padding:8px 18px;font-size:13px}
-.mmb{display:none;background:none;border:none;color:var(--t1);cursor:pointer;padding:8px}
 .mobile-theme-nav{display:none}
 @media(max-width:768px){.mobile-theme-nav{display:flex}}
-.mmo{display:none;position:fixed;inset:0;z-index:150;background:rgba(8,12,20,.96);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:8px}
-.mmo.open{display:flex}
-.mmo a{font-size:18px;font-weight:600;color:var(--t1);text-decoration:none;padding:14px 32px}.mmo a:hover{color:var(--ac)}
-.mmc{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--t1);cursor:pointer;padding:8px}
-
-/* INLINE LOGOMARK for NAV */
-.nav-logo-mark{width:28px;height:28px;flex-shrink:0}
+.nav-mark{width:28px;height:28px;flex-shrink:0}
 
 /* AUTH */
 .page{display:none;min-height:100vh}.page.active{display:block}
@@ -166,7 +208,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 
 /* HERO LOGO LOCKUP */
 .hero-logo-lockup{display:flex;align-items:center;gap:14px;margin-bottom:28px}
-.hero-logo-lockup svg{width:52px;height:52px}
+.hero-logo-lockup .hero-mark{width:52px;height:52px}
 .hero-logo-name{font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;font-family:var(--mo);color:var(--t3)}
 
 /* DASH */
@@ -238,15 +280,15 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .ci-btn:hover{border-color:var(--ac);color:var(--ac)}
 .ci-btn.danger{color:var(--r);border-color:rgba(248,113,113,.2)}.ci-btn.danger:hover{background:var(--rd)}
 
-/* PRICING */
-.prg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;align-items:start}
-.prc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rxl);padding:36px 28px;display:flex;flex-direction:column;transition:var(--tr);position:relative;overflow:hidden}
-.prc.ft{border-color:var(--ac);background:linear-gradient(180deg,rgba(56,189,248,.04) 0%,var(--bg3) 40%);transform:scale(1.03);z-index:1}
+/* PRICING — FIXED: generous spacing, aligned content */
+.prg{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;align-items:start}
+.prc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rxl);padding:38px 34px;display:flex;flex-direction:column;transition:var(--tr);position:relative;overflow:hidden}
+.prc.ft{border-color:var(--ac);background:linear-gradient(180deg,rgba(56,189,248,.04) 0%,var(--bg3) 40%);z-index:1}
 .prc.ft::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ac),var(--a2))}
 .prc:hover{border-color:var(--b2)}
 .prb{display:inline-flex;padding:4px 12px;border-radius:var(--rf);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:18px;width:fit-content}
 .prb.s{background:var(--acd);color:var(--ac)}.prb.p{background:linear-gradient(135deg,var(--ac),var(--a2));color:#fff}.prb.i{background:var(--a2d);color:var(--a2)}
-.prn{font-size:20px;font-weight:700;margin-bottom:8px}.prd{font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.6}
+.prn{font-size:20px;font-weight:700;margin-bottom:8px}.prd{font-size:13px;color:var(--t2);margin-bottom:24px;line-height:1.6;min-height:42px}
 .pra{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}
 .prc2{font-size:18px;font-weight:600;color:var(--t2)}.prv{font-size:42px;font-weight:800;letter-spacing:-2px}.prp{font-size:14px;color:var(--t3)}
 .prbi{font-size:12px;color:var(--t3);margin-bottom:24px}
@@ -312,38 +354,30 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .phnd{width:16px;height:16px;border-radius:5px;background:var(--b1)}.phnd.on{background:var(--ac)}
 .phnl{font-size:6px;color:var(--t3)}
 
-/* ROADMAP */
-.rmt{display:flex;margin-top:44px;position:relative;overflow-x:auto;padding-bottom:16px}
-.rmt::before{content:'';position:absolute;top:22px;left:0;right:0;height:2px;background:var(--b1)}
-.rmi{flex-shrink:0;width:170px;position:relative;padding-top:44px}
-.rmd{width:11px;height:11px;border-radius:50%;background:var(--bg3);border:2px solid var(--t3);position:absolute;top:17px;left:0;z-index:2}
-.rmd.now{background:var(--g);border-color:var(--g);box-shadow:0 0 8px var(--g)}
-.rmp{font-family:var(--mo);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:4px;font-weight:500}
-.rmi h4{font-size:13px;font-weight:600;margin-bottom:3px}.rmi p{font-size:11px;color:var(--t2);line-height:1.5}
-
 /* FOOTER */
-.ft{border-top:1px solid var(--b1);padding:56px 0 36px}
-.ftg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px}
-.ftbr p{font-size:13px;color:var(--t2);margin-top:10px;line-height:1.7;max-width:280px}
-.ftc h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:14px}
-.ftc a{display:block;font-size:13px;color:var(--t2);text-decoration:none;margin-bottom:8px;transition:color var(--tr)}.ftc a:hover{color:var(--ac)}
-.ftb{display:flex;justify-content:space-between;align-items:center;margin-top:40px;padding-top:20px;border-top:1px solid var(--b1)}.ftb p{font-size:11px;color:var(--t3)}
-.ftbs{display:flex;gap:6px;flex-wrap:wrap}
-.ftbd{padding:4px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:6px;font-size:10px;font-weight:600;color:var(--t2)}
+.site-footer{border-top:1px solid var(--b1);padding:56px 0 36px}
+.site-footer .ftg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px}
+.site-footer .ftbr p{font-size:13px;color:var(--t2);margin-top:10px;line-height:1.7;max-width:280px}
+.site-footer .ftc h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:14px}
+.site-footer .ftc a{display:block;font-size:13px;color:var(--t2);text-decoration:none;margin-bottom:8px;transition:color var(--tr)}.site-footer .ftc a:hover{color:var(--ac)}
+.site-footer .ftb{display:flex;justify-content:space-between;align-items:center;margin-top:40px;padding-top:20px;border-top:1px solid var(--b1)}.site-footer .ftb p{font-size:11px;color:var(--t3)}
+.site-footer .ftbs{display:flex;gap:6px;flex-wrap:wrap}
+.site-footer .ftbd{padding:4px 10px;background:var(--bg3);border:1px solid var(--b1);border-radius:6px;font-size:10px;font-weight:600;color:var(--t2)}
 
 /* MOBILE NAV */
 .mn{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;height:60px;background:rgba(15,21,32,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--b1);align-items:center;justify-content:space-around;padding:0 4px}
 .mni{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--t3);font-size:9px;font-weight:600;padding:6px 10px;transition:color var(--tr)}.mni.act,.mni:hover{color:var(--ac)}.mni svg{width:20px;height:20px}
-.mfab{position:fixed;bottom:76px;right:18px;z-index:201;width:50px;height:50px;background:var(--ac);border-radius:50%;display:none;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(56,189,248,.35);cursor:pointer;transition:var(--tr);border:none}.mfab:hover{transform:scale(1.08)}.mfab svg{width:22px;height:22px;color:var(--td)}
+.mfab{position:fixed;bottom:24px;right:24px;z-index:201;width:50px;height:50px;background:linear-gradient(135deg,var(--ac),var(--a2));border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(56,189,248,.35);cursor:pointer;transition:var(--tr);border:none}.mfab:hover{transform:scale(1.08)}.mfab svg{width:24px;height:24px;color:#fff}
+.mfab.chat-open{background:var(--r);box-shadow:0 6px 20px rgba(248,113,113,.3)}
 
 /* ANIM */
 .fu{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease}.fu.vis{opacity:1;transform:translateY(0)}
 
 /* RESPONSIVE */
-@media(max-width:1024px){.hg{grid-template-columns:1fr;gap:36px}.feg,.ag,.mc-grid{grid-template-columns:repeat(2,1fr)}.sg,.rg,.ci-grid,.mg{grid-template-columns:1fr}.hw-steps{grid-template-columns:1fr}.hw-steps::before{display:none}.ftg{grid-template-columns:1fr 1fr;gap:28px}.wif-grid{grid-template-columns:1fr}}
-@media(max-width:900px){.prg{grid-template-columns:1fr 1fr;gap:14px}.prg .prc:last-child{grid-column:1/-1;max-width:480px;margin:0 auto;width:100%}.prc.ft{transform:none}}
-@media(max-width:768px){.nl,.nr{display:none}.mobile-theme-nav{display:flex}.sec{padding:60px 0}.hero{min-height:auto;padding-top:90px;padding-bottom:32px}.hm{gap:20px;flex-wrap:wrap}.hmv{font-size:22px}.pg{grid-template-columns:1fr}.feg,.ag,.mc-grid{grid-template-columns:1fr}.prg{grid-template-columns:1fr;max-width:440px;margin-left:auto;margin-right:auto}.prg .prc:last-child{max-width:100%}.prc.ft{transform:none}.ftg{grid-template-columns:1fr;gap:24px}.ftb{flex-direction:column;gap:14px;text-align:center}.mn{display:flex}.mfab{display:flex}body{padding-bottom:72px}.rmi{width:150px}.ph{width:190px}.ac2{padding:32px 24px}.wif-grid{grid-template-columns:1fr}}
-@media(max-width:480px){.ctn{padding:0 16px}.hero h1{font-size:30px}.hd{font-size:14px}.hm{flex-direction:column;gap:14px}.ha{flex-direction:column}.ha .btn{width:100%;justify-content:center}.dg{grid-template-columns:1fr}.dbs{flex-direction:column}.st{font-size:24px}.prc{padding:28px 20px}.ac2{padding:28px 18px;border-radius:var(--rl)}.fr{flex-direction:column;gap:0}}
+@media(max-width:1024px){.hg{grid-template-columns:1fr;gap:36px}.feg,.ag,.mc-grid{grid-template-columns:repeat(2,1fr)}.sg,.rg,.ci-grid,.mg{grid-template-columns:1fr}.hw-steps{grid-template-columns:1fr}.hw-steps::before{display:none}.site-footer .ftg{grid-template-columns:1fr 1fr;gap:28px}.wif-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.prg{grid-template-columns:1fr 1fr;gap:14px}.prg .prc:last-child{grid-column:1/-1;max-width:480px;margin:0 auto;width:100%}}
+@media(max-width:768px){.nl,.nr{display:none}.mobile-theme-nav{display:flex}.sec{padding:60px 0}.hero{min-height:auto;padding-top:90px;padding-bottom:32px}.hm{gap:20px;flex-wrap:wrap}.hmv{font-size:22px}.pg{grid-template-columns:1fr}.feg,.ag,.mc-grid{grid-template-columns:1fr}.prg{grid-template-columns:1fr;max-width:440px;margin-left:auto;margin-right:auto}.prg .prc:last-child{max-width:100%}.site-footer .ftg{grid-template-columns:1fr;gap:24px}.site-footer .ftb{flex-direction:column;gap:14px;text-align:center}.mn{display:flex}.mfab{bottom:76px;right:18px}body{padding-bottom:72px}.social-fab-menu{bottom:140px}}
+@media(max-width:480px){.ctn{padding:0 16px}.hero h1{font-size:30px}.hd{font-size:14px}.hm{flex-direction:column;gap:14px}.ha{flex-direction:column}.ha .btn{width:100%;justify-content:center}.dg{grid-template-columns:1fr}.dbs{flex-direction:column}.st{font-size:24px}.prc{padding:28px 20px}.ac2{padding:28px 18px;border-radius:var(--rl)}.fr{flex-direction:column;gap:0}.more-sheet-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -351,14 +385,14 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ═══════════════════════════════════════════════════════ NAV -->
 <nav class="nav">
   <a href="#" class="logo" onclick="showPage('landing');return false;">
-    <!-- Inline logomark SVG -->
-    <svg class="nav-logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path class="logo-svg-arc" d="M38 10 A20 20 0 1 1 10 38" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-      <path class="logo-svg-inner-arc" d="M34 14 A14.5 14.5 0 0 1 14 34" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.35" fill="none"/>
-      <path class="logo-svg-text" d="M14.5 35 L24 13 L33.5 35" stroke="#e4e9f2" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <path class="logo-svg-crossbar" d="M18.2 27 H29.8" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+    <svg class="nav-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path class="oqv-arc" d="M38 24 A14 14 0 1 0 24 38" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+      <path class="oqv-arc-inner" d="M33 24 A9 9 0 1 0 24 33" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.30" fill="none"/>
+      <circle class="oqv-ring" cx="24" cy="24" r="5.5" stroke-width="1.8" fill="none" stroke-opacity="0.55"/>
+      <path class="oqv-tail" d="M27.9 27.9 L34 34" stroke-width="2.6" stroke-linecap="round"/>
+      <circle class="oqv-dot" cx="35.2" cy="35.2" r="1.4"/>
     </svg>
-    Avoryn
+    Oqvara
   </a>
   <div class="nl">
     <a href="#platform" onclick="showPage('landing')">Platform</a>
@@ -366,7 +400,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <a href="#pricing" onclick="showPage('landing')">Pricing</a>
     <a href="#security" onclick="showPage('landing')">Security</a>
     <a href="#architecture" onclick="showPage('landing')">Architecture</a>
-    <a href="#roadmap" onclick="showPage('landing')">Roadmap</a>
+    <a href="#howitworks" onclick="showPage('landing')">How It Works</a>
   </div>
   <div class="nr">
     <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
@@ -382,16 +416,48 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   </button>
 </nav>
 
-<!-- ═══════════════════════════════════════════════════════ MORE MENU -->
-<div class="more-overlay" id="moreMenu">
-  <button class="more-close" onclick="closeMore()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-  <a href="#platform" onclick="closeMore();showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Platform</a>
-  <a href="#security" onclick="closeMore();showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Security</a>
-  <a href="#architecture" onclick="closeMore();showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Architecture</a>
-  <a href="#howitworks" onclick="closeMore();showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>How It Works</a>
-  <a href="#roadmap" onclick="closeMore();showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Roadmap</a>
-  <a href="#" onclick="closeMore();showPage('login');return false;" style="color:var(--ac)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Sign In</a>
-  <a href="#" onclick="closeMore();showPage('register');return false;" style="color:var(--ac)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>Get Access</a>
+<!-- ═══════════════════════════════════════════════════════ MORE MENU — Compact Bottom Sheet -->
+<div class="more-sheet-backdrop" id="moreBackdrop" onclick="closeMore()"></div>
+<div class="more-sheet" id="moreSheet">
+  <div class="more-sheet-title">Explore</div>
+  <div class="more-sheet-grid">
+    <a class="more-sheet-item" href="#platform" onclick="closeMore();showPage('landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Platform
+    </a>
+    <a class="more-sheet-item" href="#security" onclick="closeMore();showPage('landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Security
+    </a>
+    <a class="more-sheet-item" href="#architecture" onclick="closeMore();showPage('landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Architecture
+    </a>
+    <a class="more-sheet-item" href="#howitworks" onclick="closeMore();showPage('landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      How It Works
+    </a>
+    <a class="more-sheet-item" href="#whoisitfor" onclick="closeMore();showPage('landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Who It's For
+    </a>
+    <a class="more-sheet-item" href="#markets" onclick="closeMore();showPage('landing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Markets
+    </a>
+  </div>
+  <div class="more-sheet-divider"></div>
+  <div class="more-sheet-title">Account</div>
+  <div class="more-sheet-row">
+    <a class="more-sheet-item" href="#" onclick="closeMore();showPage('login');return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      Sign In
+    </a>
+    <a class="more-sheet-item" href="#" onclick="closeMore();showPage('register');return false;" style="border-color:rgba(56,189,248,.2)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+      Get Access
+    </a>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════ LOGIN PAGE -->
@@ -400,12 +466,13 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <div class="ac2">
       <div class="ah">
         <a href="#" class="logo" onclick="showPage('landing');return false;">
-          <svg class="nav-logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path class="logo-svg-arc" d="M38 10 A20 20 0 1 1 10 38" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-            <path class="logo-svg-text" d="M14.5 35 L24 13 L33.5 35" stroke="#e4e9f2" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path class="logo-svg-crossbar" d="M18.2 27 H29.8" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+          <svg class="nav-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="oqv-arc" d="M38 24 A14 14 0 1 0 24 38" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+            <circle class="oqv-ring" cx="24" cy="24" r="5.5" stroke-width="1.8" fill="none" stroke-opacity="0.55"/>
+            <path class="oqv-tail" d="M27.9 27.9 L34 34" stroke-width="2.6" stroke-linecap="round"/>
+            <circle class="oqv-dot" cx="35.2" cy="35.2" r="1.4"/>
           </svg>
-          Avoryn
+          Oqvara
         </a>
         <h2>Operator Sign In</h2>
         <p>Access your execution supervision console</p>
@@ -433,12 +500,13 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <div class="ac2">
       <div class="ah">
         <a href="#" class="logo" onclick="showPage('landing');return false;">
-          <svg class="nav-logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path class="logo-svg-arc" d="M38 10 A20 20 0 1 1 10 38" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-            <path class="logo-svg-text" d="M14.5 35 L24 13 L33.5 35" stroke="#e4e9f2" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path class="logo-svg-crossbar" d="M18.2 27 H29.8" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+          <svg class="nav-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="oqv-arc" d="M38 24 A14 14 0 1 0 24 38" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+            <circle class="oqv-ring" cx="24" cy="24" r="5.5" stroke-width="1.8" fill="none" stroke-opacity="0.55"/>
+            <path class="oqv-tail" d="M27.9 27.9 L34 34" stroke-width="2.6" stroke-linecap="round"/>
+            <circle class="oqv-dot" cx="35.2" cy="35.2" r="1.4"/>
           </svg>
-          Avoryn
+          Oqvara
         </a>
         <h2>Create Operator Account</h2>
         <p>Start your 14-day supervised trial — no card required</p>
@@ -453,7 +521,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
         <div class="fg"><label class="fl">Email address</label><input type="email" class="fi" placeholder="operator@email.com" required></div>
         <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="rp" placeholder="Min. 12 characters" required minlength="12"><button type="button" class="pt" onclick="tp('rp',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div><div class="fh">Min. 12 characters · 1 uppercase · 1 number · 1 symbol</div></div>
         <div class="fg"><label class="fl">Operating context</label><select class="fi" required><option value="" disabled selected>Describe your setup</option><option>Solo operator / independent trader</option><option>EA developer with live deployment</option><option>Small prop desk (2–10 seats)</option><option>Portfolio manager / fund operator</option><option>Broker-side infrastructure team</option></select></div>
-        <label class="fc"><input type="checkbox" required><span>I agree to Avoryn's <a href="#">Terms of Service</a>, <a href="#">Privacy Policy</a>, and <a href="#">Risk Disclosure</a>. I understand automated trading involves inherent market risk.</span></label>
+        <label class="fc"><input type="checkbox" required><span>I agree to Oqvara's <a href="#">Terms of Service</a>, <a href="#">Privacy Policy</a>, and <a href="#">Risk Disclosure</a>. I understand automated trading involves inherent market risk.</span></label>
         <button type="submit" class="btn bp bb bl">Create Operator Account</button>
       </form>
       <div class="asn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>14-day trial included · No credit card · Cancel anytime</div>
@@ -470,35 +538,34 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   <div class="ctn">
     <div class="hg">
       <div class="fu">
-        <!-- Hero full logo lockup -->
         <div class="hero-logo-lockup">
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path class="logo-svg-arc" d="M38 10 A20 20 0 1 1 10 38" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-            <path class="logo-svg-inner-arc" d="M34 14 A14.5 14.5 0 0 1 14 34" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.35" fill="none"/>
-            <path class="logo-svg-text" d="M14.5 35 L24 13 L33.5 35" stroke="#e4e9f2" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path class="logo-svg-crossbar" d="M18.2 27 H29.8" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+          <svg class="hero-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="oqv-arc" d="M38 24 A14 14 0 1 0 24 38" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+            <path class="oqv-arc-inner" d="M33 24 A9 9 0 1 0 24 33" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.30" fill="none"/>
+            <circle class="oqv-ring" cx="24" cy="24" r="5.5" stroke-width="1.8" fill="none" stroke-opacity="0.55"/>
+            <path class="oqv-tail" d="M27.9 27.9 L34 34" stroke-width="2.6" stroke-linecap="round"/>
+            <circle class="oqv-dot" cx="35.2" cy="35.2" r="1.4"/>
           </svg>
-          <span class="hero-logo-name">Avoryn</span>
+          <span class="hero-logo-name">Oqvara</span>
         </div>
-
         <div class="hb"><span class="pu"></span> Early Access · Prototype v0.2</div>
         <h1>Operator-Grade<br><span class="grd">Execution Supervision</span><br>for Live Markets</h1>
-        <p class="hd">Avoryn sits between your strategy and the live market — supervising broker-connected execution, enforcing risk rules, and giving operators full incident visibility and control.</p>
+        <p class="hd">Oqvara sits between your strategy and the live market — supervising broker-connected execution, enforcing risk rules, and giving operators full incident visibility and control.</p>
         <div class="ha">
           <a href="#" class="btn bp bl" onclick="showPage('register');return false;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Request Access</a>
           <a href="#howitworks" class="btn bo bl">How It Works</a>
         </div>
         <div class="hm">
-          <div><div class="hmv">Realtime</div><div class="hml">Execution monitoring</div></div>
-          <div><div class="hmv">24 / 7</div><div class="hml">Autonomous supervision</div></div>
-          <div><div class="hmv">Audit-ready</div><div class="hml">Full incident trail</div></div>
+          <div><div class="hmv">Broker-Connected</div><div class="hml">Execution monitoring</div></div>
+          <div><div class="hmv">Continuous</div><div class="hml">Autonomous supervision</div></div>
+          <div><div class="hmv">Audit-Ready</div><div class="hml">Full incident trail</div></div>
         </div>
       </div>
       <div class="dp fu" style="transition-delay:.12s">
         <div class="dd2"><span></span><span></span><span></span></div>
         <div class="dg">
           <div class="dc"><div class="dcl">Equity</div><div class="dcv" style="color:var(--g)">$124,830</div><div class="dcs">+2.4% session</div></div>
-          <div class="dc"><div class="dcl">Active EAs</div><div class="dcv" style="color:var(--ac)">7</div><div class="dcs">3 live · 2 paper · 2 paused</div></div>
+          <div class="dc"><div class="dcl">Active Strategies</div><div class="dcv" style="color:var(--ac)">7</div><div class="dcs">3 live · 2 paper · 2 paused</div></div>
           <div class="dc"><div class="dcl">Drawdown</div><div class="dcv" style="color:var(--am)">4.2%</div><div class="dcs">Configured limit: 8%</div></div>
           <div class="dc"><div class="dcl">Risk Guards</div><div class="dcv" style="color:var(--g)">All Active</div><div class="dcs">Kill switch armed</div></div>
           <div class="dch"><svg viewBox="0 0 600 100" preserveAspectRatio="none"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38bdf8" stop-opacity=".18"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/></linearGradient></defs><path d="M0,80 C60,75 120,60 180,50 C240,40 300,45 360,30 C420,18 480,28 540,14 C570,10 600,8 600,8 L600,100 L0,100Z" fill="url(#cg)"/><path d="M0,80 C60,75 120,60 180,50 C240,40 300,45 360,30 C420,18 480,28 540,14 C570,10 600,8 600,8" stroke="#38bdf8" stroke-width="2" fill="none"/></svg></div>
@@ -518,12 +585,12 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ── PLATFORM OVERVIEW ──────────────────────────────────── -->
 <section class="sec" id="platform">
   <div class="ctn">
-    <div class="fu"><span class="sl">Platform Overview</span><h2 class="st">More Than a Monitor.<br>An Execution Control Layer.</h2><p class="ss">Avoryn connects to your broker environment, wraps your strategy logic with enforceable risk rules, and gives operators the visibility and intervention tools they need when it matters.</p></div>
+    <div class="fu"><span class="sl">Platform Overview</span><h2 class="st">More Than a Monitor.<br>An Execution Control Layer.</h2><p class="ss">Oqvara connects to your broker environment, wraps your strategy logic with enforceable risk rules, and gives operators the visibility and intervention tools they need when it matters most.</p></div>
     <div class="pg">
       <div class="pc fu"><div class="pi" style="background:var(--acd);color:var(--ac)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h3>Execution Supervision</h3><p>Continuously monitor all broker-connected execution — order flow, fill status, latency, and position state — from a unified operator console.</p></div>
-      <div class="pc fu" style="transition-delay:.06s"><div class="pi" style="background:var(--a2d);color:var(--a2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div><h3>EA & Strategy Oversight</h3><p>Wrap existing expert advisors — predefined or custom — with modern supervision: risk enforcement, structured logging, and operational visibility without touching the EA logic.</p></div>
+      <div class="pc fu" style="transition-delay:.06s"><div class="pi" style="background:var(--a2d);color:var(--a2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div><h3>Strategy Oversight</h3><p>Wrap predefined or custom strategies — including expert advisors — with structured supervision: risk enforcement, structured logging, and operational visibility without touching strategy logic.</p></div>
       <div class="pc fu" style="transition-delay:.12s"><div class="pi" style="background:var(--gd);color:var(--g)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Risk-Aware Automation</h3><p>Every execution passes through configurable risk gates — drawdown thresholds, position sizing caps, daily loss limits — enforced in real time before orders reach the broker.</p></div>
-      <div class="pc fu" style="transition-delay:.18s"><div class="pi" style="background:var(--rd);color:var(--r)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Incident Control</h3><p>Full audit trail, anomaly alerting, and targeted intervention. When something goes wrong, operators see it first — and can act immediately.</p></div>
+      <div class="pc fu" style="transition-delay:.18s"><div class="pi" style="background:var(--rd);color:var(--r)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Incident Control</h3><p>Full audit trail, anomaly alerting, and targeted intervention. When something deviates, operators see it first — and can act immediately from the console or mobile.</p></div>
     </div>
   </div>
 </section>
@@ -537,19 +604,19 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
       <div class="hw-step fu">
         <div class="hw-num">01</div>
         <h3>Connect Your Environment</h3>
-        <p>Link your MetaTrader 4/5 instance and broker account. Avoryn establishes a secure bridge between your execution environment and the supervision layer — no modification to your EA logic required.</p>
+        <p>Link your MetaTrader 4/5 instance and broker account. Oqvara establishes a secure bridge between your execution environment and the supervision layer — no modification to your strategy logic required.</p>
         <span class="hw-tag">MT4 / MT5 Bridge</span>
       </div>
       <div class="hw-step fu" style="transition-delay:.08s">
         <div class="hw-num">02</div>
         <h3>Define Your Supervision Rules</h3>
-        <p>Configure your risk boundaries — drawdown limits, per-trade exposure caps, daily loss stops, and correlation guards. Avoryn enforces these as hard pre-trade checks before any order is routed.</p>
+        <p>Configure your risk boundaries — drawdown limits, per-trade exposure caps, daily loss stops, and correlation guards. Oqvara enforces these as hard pre-trade checks before any order is routed to the broker.</p>
         <span class="hw-tag">Risk Engine</span>
       </div>
       <div class="hw-step fu" style="transition-delay:.16s">
         <div class="hw-num">03</div>
         <h3>Monitor, Alert & Intervene</h3>
-        <p>Your operator console surfaces real-time execution state, triggered alerts, and a full incident log. When a rule fires or an anomaly appears, you can pause, halt, or override — instantly.</p>
+        <p>Your operator console surfaces real-time execution state, triggered alerts, and a full incident log. When a rule fires or an anomaly appears, you can pause, halt, or override — instantly, from web or mobile.</p>
         <span class="hw-tag">Incident Control</span>
       </div>
     </div>
@@ -560,39 +627,23 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ── WHO IT'S FOR ───────────────────────────────────────── -->
 <section class="sec" id="whoisitfor">
   <div class="ctn">
-    <div class="fu"><span class="sl">Who Avoryn Is For</span><h2 class="st">Built for Operators Who Run Live Strategies.</h2><p class="ss">Avoryn is designed for anyone running automated execution against live broker accounts and needing structured supervision, not just a dashboard.</p></div>
+    <div class="fu"><span class="sl">Who Oqvara Is For</span><h2 class="st">Built for Operators Who Run Live Strategies.</h2><p class="ss">Oqvara is designed for anyone running automated execution against live broker accounts who needs structured supervision — not just a dashboard.</p></div>
     <div class="wif-grid">
       <div class="wif-card fu">
         <div class="wif-icon" style="background:var(--acd);color:var(--ac)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg></div>
-        <div>
-          <h3>Independent Operators & EA Traders</h3>
-          <p>You've built or purchased a working strategy. You need confidence it's running within your risk parameters — without watching a terminal screen all day.</p>
-          <div class="wif-tag">Solo / Self-managed</div>
-        </div>
+        <div><h3>Independent Operators & Systematic Traders</h3><p>You run a working strategy — predefined or custom-built. You need confidence it's executing within your risk parameters without watching a terminal screen continuously.</p><div class="wif-tag">Solo / Self-managed</div></div>
       </div>
       <div class="wif-card fu" style="transition-delay:.06s">
         <div class="wif-icon" style="background:var(--a2d);color:var(--a2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M12 12v4M10 14h4"/></svg></div>
-        <div>
-          <h3>EA Developers Running Live Deployments</h3>
-          <p>You write the logic. Avoryn handles the operational layer — execution monitoring, error capture, risk enforcement, and client-facing transparency — separately from the EA code.</p>
-          <div class="wif-tag">Developer / Systematic</div>
-        </div>
+        <div><h3>EA Developers Running Live Deployments</h3><p>You write the logic. Oqvara handles the operational layer — execution monitoring, error capture, risk enforcement, and incident auditability — completely separate from your EA code.</p><div class="wif-tag">Developer / Systematic</div></div>
       </div>
       <div class="wif-card fu" style="transition-delay:.12s">
         <div class="wif-icon" style="background:var(--gd);color:var(--g)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <div>
-          <h3>Small Prop Desks & Trading Teams</h3>
-          <p>Multiple accounts, multiple strategies, multiple operators. Avoryn centralizes oversight with role-based access — so managers see everything, operators act within defined scope.</p>
-          <div class="wif-tag">Team / Prop Desk</div>
-        </div>
+        <div><h3>Small Prop Desks & Trading Teams</h3><p>Multiple accounts, multiple strategies, multiple operators. Oqvara centralizes oversight with role-based access — so managers see everything, operators act within defined scope.</p><div class="wif-tag">Team / Prop Desk</div></div>
       </div>
       <div class="wif-card fu" style="transition-delay:.18s">
         <div class="wif-icon" style="background:var(--rd);color:var(--r)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div>
-        <div>
-          <h3>Portfolio Managers Overseeing Automation</h3>
-          <p>You allocate to systematic strategies but need a structured oversight layer — audit logs, risk reports, and intervention tools — that a terminal window simply doesn't provide.</p>
-          <div class="wif-tag">Portfolio / Fund-level</div>
-        </div>
+        <div><h3>Portfolio Managers Overseeing Automation</h3><p>You allocate to systematic strategies but need a structured oversight layer — audit logs, risk reports, and intervention tools — that a terminal window simply does not provide.</p><div class="wif-tag">Portfolio / Fund-level</div></div>
       </div>
     </div>
   </div>
@@ -602,11 +653,11 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ── FEATURES ───────────────────────────────────────────── -->
 <section class="sec" id="features">
   <div class="ctn">
-    <div class="fu"><span class="sl">Platform Capabilities</span><h2 class="st">Everything You Need for Operational Control.</h2><p class="ss">A disciplined feature set built for execution oversight, risk enforcement, and incident auditability.</p></div>
+    <div class="fu"><span class="sl">Platform Capabilities</span><h2 class="st">Everything You Need for Operational Control.</h2><p class="ss">A disciplined feature set built for execution oversight, risk enforcement, and incident auditability — designed to grow with your operation.</p></div>
     <div class="feg">
-      <div class="fec fu"><div class="fei" style="background:var(--acd);color:var(--ac)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></div><h3>EA Supervision Layer</h3><p>Wrap any MT4/MT5 expert advisor — predefined or custom — with structured oversight and intervention controls.</p></div>
+      <div class="fec fu"><div class="fei" style="background:var(--acd);color:var(--ac)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></div><h3>Strategy Supervision Layer</h3><p>Wrap any MT4/MT5 strategy — predefined or custom-built — with structured oversight and operator intervention controls.</p></div>
       <div class="fec fu" style="transition-delay:.05s"><div class="fei" style="background:var(--a2d);color:var(--a2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><h3>Strategy Management</h3><p>Deploy, version, pause, and schedule strategies with per-account configuration and full change history.</p></div>
-      <div class="fec fu" style="transition-delay:.1s"><div class="fei" style="background:var(--acd);color:var(--ac)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>Real-Time Execution Status</h3><p>Live console showing EA health, order flow, fill confirmation, position state, and P&L — per account and aggregated.</p></div>
+      <div class="fec fu" style="transition-delay:.1s"><div class="fei" style="background:var(--acd);color:var(--ac)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>Real-Time Execution Status</h3><p>Live console showing strategy health, order flow, fill confirmation, position state, and P&amp;L — per account and aggregated.</p></div>
       <div class="fec fu" style="transition-delay:.15s"><div class="fei" style="background:var(--rd);color:var(--r)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg></div><h3>Risk Engine</h3><p>Pre-trade rule evaluation against drawdown limits, exposure caps, loss thresholds, and correlation guards — configurable per strategy.</p></div>
       <div class="fec fu" style="transition-delay:.2s"><div class="fei" style="background:var(--gd);color:var(--g)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><h3>Drawdown Protection</h3><p>Auto-pause or auto-close on drawdown breach. Configurable thresholds with grace rules and cool-down periods.</p></div>
       <div class="fec fu" style="transition-delay:.25s"><div class="fei" style="background:var(--amd);color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><h3>Multi-Channel Alerting</h3><p>Critical events delivered via email, webhook, and Telegram — with severity levels, acknowledgment state, and escalation logic.</p></div>
@@ -621,7 +672,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ── MARKET & BROKER COVERAGE ───────────────────────────── -->
 <section class="sec" id="markets">
   <div class="ctn">
-    <div class="fu"><span class="sl">Market & Broker Coverage</span><h2 class="st">Starting With Forex & Metals.<br>Expanding to the Broader MT Ecosystem.</h2><p class="ss">Avoryn is built around the MetaTrader 4/5 execution environment — where most serious retail and institutional automation happens today.</p></div>
+    <div class="fu"><span class="sl">Market & Broker Coverage</span><h2 class="st">Starting with Forex & Metals.<br>Ready for the Broader MT Ecosystem.</h2><p class="ss">Oqvara is built around the MetaTrader 4/5 execution environment — where most serious retail and institutional automation runs today.</p></div>
     <div class="mc-grid">
       <div class="mc-card fu">
         <div class="mc-icon" style="background:var(--acd);color:var(--ac)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
@@ -632,19 +683,19 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
       <div class="mc-card fu" style="transition-delay:.08s">
         <div class="mc-icon" style="background:var(--amd);color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
         <h3>Metals</h3>
-        <p>Spot gold and silver — among the most supervised instruments in automated trading due to volatility and spread sensitivity.</p>
+        <p>Spot gold (XAUUSD) and silver — the most closely supervised instruments in automated trading due to volatility and spread sensitivity.</p>
         <div class="mc-pairs"><span class="mc-pair">XAUUSD</span><span class="mc-pair">XAGUSD</span></div>
       </div>
       <div class="mc-card fu" style="transition-delay:.16s">
         <div class="mc-icon" style="background:var(--a2d);color:var(--a2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg></div>
         <h3>Indices, Commodities & Crypto CFDs</h3>
-        <p>Roadmapped support for any MT-compatible instrument — indices, energies, soft commodities, and crypto CFDs — as broker symbol mapping matures.</p>
+        <p>Roadmapped: full support for any MT-compatible instrument — indices, energies, soft commodities, and crypto CFDs.</p>
         <div class="mc-pairs"><span class="mc-pair">NAS100</span><span class="mc-pair">US30</span><span class="mc-pair">BTCUSD</span><span class="mc-pair">WTI</span></div>
       </div>
     </div>
     <div class="mc-note fu">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-      <span>Avoryn supervises execution at the operator layer — it does not discriminate by instrument type. Any symbol your broker supports in MetaTrader 4/5 can be monitored and supervised through the platform. Instrument availability depends entirely on your broker's offering.</span>
+      <span>Oqvara supervises execution at the operator layer. Any symbol your broker supports in MetaTrader 4/5 can be monitored and supervised through the platform.</span>
     </div>
   </div>
 </section>
@@ -653,34 +704,34 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ── COMMAND & INCIDENT CONTROL ─────────────────────────── -->
 <section class="sec" id="command">
   <div class="ctn">
-    <div class="fu"><span class="sl">Command & Incident Control</span><h2 class="st">See It. Act On It. Document It.</h2><p class="ss">When execution deviates from expected behavior, operators need to respond in seconds — not navigate a terminal. Avoryn puts control at the surface.</p></div>
+    <div class="fu"><span class="sl">Command & Incident Control</span><h2 class="st">See It. Act On It. Document It.</h2><p class="ss">When execution deviates from expected behavior, operators need to respond in seconds — not navigate a terminal. Oqvara puts control at the surface.</p></div>
     <div class="ci-grid">
       <div class="ci-list">
-        <div class="ci-item fu"><div class="ci-ico" style="background:var(--rd);color:var(--r)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><path d="M12 8v4M12 16h.01"/></svg></div><div><h4>Emergency Kill Switch</h4><p>One action halts all active execution across all connected accounts — immediately. Designed for adverse conditions, not normal operations.</p></div></div>
-        <div class="ci-item fu" style="transition-delay:.05s"><div class="ci-ico" style="background:var(--amd);color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div><h4>Incident Alert Triage</h4><p>Critical, warning, and informational events surface in a structured alert queue — with context, timing, and acknowledgment state visible at a glance.</p></div></div>
-        <div class="ci-item fu" style="transition-delay:.1s"><div class="ci-ico" style="background:var(--acd);color:var(--ac)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div><h4>Per-EA Pause & Resume</h4><p>Pause individual strategies without stopping others. Resume after investigating or adjusting configuration — no terminal access required.</p></div></div>
-        <div class="ci-item fu" style="transition-delay:.15s"><div class="ci-ico" style="background:var(--gd);color:var(--g)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><div><h4>Audit Log Replay</h4><p>Reconstruct any session or incident from the immutable log — every order event, rule trigger, and operator action, with full timeline context.</p></div></div>
+        <div class="ci-item fu"><div class="ci-ico" style="background:var(--rd);color:var(--r)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><path d="M12 8v4M12 16h.01"/></svg></div><div><h4>Emergency Kill Switch</h4><p>One action halts all active execution across all connected accounts immediately.</p></div></div>
+        <div class="ci-item fu" style="transition-delay:.05s"><div class="ci-ico" style="background:var(--amd);color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div><h4>Incident Alert Triage</h4><p>Critical, warning, and informational events surface in a structured alert queue — with context, timing, and acknowledgment state.</p></div></div>
+        <div class="ci-item fu" style="transition-delay:.1s"><div class="ci-ico" style="background:var(--acd);color:var(--ac)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div><h4>Per-Strategy Pause & Resume</h4><p>Pause individual strategies without stopping others. Resume after investigating or adjusting configuration.</p></div></div>
+        <div class="ci-item fu" style="transition-delay:.15s"><div class="ci-ico" style="background:var(--gd);color:var(--g)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><div><h4>Audit Log Replay</h4><p>Reconstruct any session or incident from the immutable log — every order event, rule trigger, and operator action.</p></div></div>
       </div>
       <div class="ci-panel fu" style="transition-delay:.1s">
         <div class="ci-panel-title">Live Incident Feed — Example</div>
         <div class="ci-event">
           <div class="ci-sev crit"></div>
-          <div class="ci-event-body"><h5>Drawdown Limit Breached — XAUUSD-MA</h5><p>Daily drawdown reached 5.0% (configured: 5.0%). EA paused automatically. Manual review required before resuming.</p></div>
+          <div class="ci-event-body"><h5>Drawdown Limit Breached — XAUUSD-MA</h5><p>Daily drawdown reached 5.0% (configured: 5.0%). Strategy paused automatically.</p></div>
           <span class="ci-event-time">14:32:08</span>
         </div>
         <div class="ci-event">
           <div class="ci-sev warn"></div>
-          <div class="ci-event-body"><h5>Correlation Warning — EURUSD + GBPUSD</h5><p>Position correlation exceeded 0.85 threshold. Exposure concentrated. No action taken — operator notified.</p></div>
+          <div class="ci-event-body"><h5>Correlation Warning — EURUSD + GBPUSD</h5><p>Position correlation exceeded 0.85 threshold. Exposure concentrated.</p></div>
           <span class="ci-event-time">14:28:41</span>
         </div>
         <div class="ci-event">
           <div class="ci-sev info"></div>
-          <div class="ci-event-body"><h5>EURUSD-EMA resumed after cooldown</h5><p>Operator resumed EA following 30-minute cool-down. Risk guards active. Session within configured limits.</p></div>
+          <div class="ci-event-body"><h5>EURUSD-EMA resumed after cooldown</h5><p>Operator resumed strategy following 30-minute cool-down. Risk guards active.</p></div>
           <span class="ci-event-time">13:55:20</span>
         </div>
         <div class="ci-event">
           <div class="ci-sev info"></div>
-          <div class="ci-event-body"><h5>Kill switch disarmed by operator</h5><p>Session restored to normal operation. All guards re-engaged. Incident recorded in audit log.</p></div>
+          <div class="ci-event-body"><h5>Kill switch disarmed by operator</h5><p>Session restored to normal operation. All guards re-engaged.</p></div>
           <span class="ci-event-time">13:42:00</span>
         </div>
         <div class="ci-actions">
@@ -696,68 +747,68 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 
 <!-- ── PRICING ────────────────────────────────────────────── -->
 <section class="sec" id="pricing">
-  <div class="ctn">
+  <div class="ctn" style="max-width:1280px">
     <div class="fu" style="text-align:center">
       <span class="sl">Subscription Plans</span>
       <h2 class="st" style="max-width:600px;margin:0 auto 16px">Transparent Pricing. Scale When You Need To.</h2>
-      <p class="ss" style="margin:0 auto;text-align:center">Every plan includes a 14-day trial of Avoryn Pro. No credit card required. Upgrade or cancel at any time.</p>
+      <p class="ss" style="margin:0 auto;text-align:center">Every plan includes a 14-day trial of Oqvara Pro. No credit card required. Upgrade or cancel at any time.</p>
       <div class="ptg"><span id="mL" class="ap2">Monthly</span><div class="ts" id="bT" onclick="tglB()"><div class="tk"></div></div><span id="yL">Yearly</span><span class="svb">Save 20%</span></div>
     </div>
     <div class="prg">
-      <!-- OPERATOR -->
+      <!-- STARTER -->
       <div class="prc fu">
-        <div class="prb s">OPERATOR</div>
-        <div class="prn">Operator</div>
-        <div class="prd">For independent traders and EA operators running a small number of live accounts.</div>
+        <div class="prb s">STARTER</div>
+        <div class="prn">Starter</div>
+        <div class="prd">For individual traders exploring automation with essential risk safeguards.</div>
         <div class="pra"><span class="prc2">$</span><span class="prv pm">29</span><span class="prv py" style="display:none">23</span><span class="prp">/month</span></div>
         <div class="prbi pm">Billed monthly</div><div class="prbi py" style="display:none">Billed $276/year</div>
         <div class="prfs">
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>3 active EAs</strong> supervised simultaneously</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>1 broker account</strong> connected</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Core risk engine — drawdown & loss guards</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Execution console & real-time monitoring</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Email alerts · 7-day incident log</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Kill switch & manual intervention</span></div>
-          <div class="prf dis"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg><span>Advanced risk rules / AI-assisted review</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>3 active bots</strong> simultaneously</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>1 trading account</strong></span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Basic risk engine (drawdown guard)</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Dashboard & real-time monitoring</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Email alerts · 7-day log retention</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Community support</span></div>
+          <div class="prf dis"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg><span>Advanced risk rules / AI review</span></div>
         </div>
-        <div class="prca"><a href="#" class="btn bo bb" onclick="showPage('register');return false;">Start 14-Day Trial</a></div>
+        <div class="prca"><a href="#" class="btn bo bb" onclick="showPage('register');return false;">Start Free Trial</a></div>
       </div>
 
-      <!-- PRO -->
+      <!-- PRO — FIXED: same padding structure as other cards -->
       <div class="prc ft fu" style="transition-delay:.08s">
         <div class="prb p">MOST POPULAR</div>
         <div class="prn">Pro</div>
-        <div class="prd">For serious operators requiring full risk control, multi-account supervision, and audit-grade logs.</div>
+        <div class="prd">For serious traders demanding full risk control and execution visibility.</div>
         <div class="pra"><span class="prc2">$</span><span class="prv pm">89</span><span class="prv py" style="display:none">71</span><span class="prp">/month</span></div>
         <div class="prbi pm">Billed monthly</div><div class="prbi py" style="display:none">Billed $852/year</div>
         <div class="prfs">
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>15 active EAs</strong> supervised simultaneously</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>5 broker accounts</strong> connected</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Full risk engine</strong> — all guard types + correlation</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Kill switch & per-EA pause / resume</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Multi-channel alerts — email, webhook, Telegram</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>90-day incident log + audit trail export</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Priority support — email + chat</span></div>
-          <div class="prf dis"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg><span>AI-assisted review (Phase 6)</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>15 active bots</strong> simultaneously</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>5 trading accounts</strong></span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Full risk engine</strong> — all guard types</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Kill switch & emergency controls</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Alerts via email, webhook & Telegram</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>90-day log + audit trail + reports</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Priority support (email + chat)</span></div>
+          <div class="prf dis"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg><span>AI review (Phase 6)</span></div>
         </div>
-        <div class="prca"><a href="#" class="btn bp bb" onclick="showPage('register');return false;">Start 14-Day Trial</a></div>
+        <div class="prca"><a href="#" class="btn bp bb" onclick="showPage('register');return false;">Start Free Trial</a></div>
       </div>
 
       <!-- INSTITUTIONAL -->
       <div class="prc fu" style="transition-delay:.16s">
         <div class="prb i">INSTITUTIONAL</div>
         <div class="prn">Institutional</div>
-        <div class="prd">For prop desks, fund operators, and teams managing multiple accounts and operator roles.</div>
+        <div class="prd">For fund managers, prop firms, and teams needing multi-account oversight.</div>
         <div class="pra"><span class="prc2">$</span><span class="prv pm">349</span><span class="prv py" style="display:none">279</span><span class="prp">/month</span></div>
-        <div class="prbi pm">Billed monthly · custom annual available</div><div class="prbi py" style="display:none">Billed $3,348/year</div>
+        <div class="prbi pm">Billed monthly · or custom annual</div><div class="prbi py" style="display:none">Billed $3,348/year</div>
         <div class="prfs">
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Unlimited EAs</strong> + <strong>unlimited accounts</strong></span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Team RBAC</strong> — admin, operator, viewer roles</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Full risk engine + custom rule authoring</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Unlimited bots</strong> + <strong>unlimited accounts</strong></span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Team RBAC</strong> — admin, operator, viewer</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Full risk engine + custom rules</span></div>
           <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Dedicated VPS execution environment</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited retention + structured log export</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>AI-assisted review & session analysis</span></div>
-          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Custom API + dedicated account manager + SLA</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited retention + compliance export</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>AI trade review & strategy optimization</span></div>
+          <div class="prf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Custom API + account manager + SLA</span></div>
         </div>
         <div class="prca"><a href="#" class="btn bo bb" onclick="showPage('register');return false;">Contact Sales</a></div>
       </div>
@@ -773,10 +824,10 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <div class="fu"><span class="sl">Security & Trust</span><h2 class="st">Security Is the Foundation.</h2><p class="ss">Execution isolation, defense-in-depth, and immutable audit logs are built into the architecture — not layered on as features.</p></div>
     <div class="sg">
       <div class="sl2">
-        <div class="si fu"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><h4>Supabase Auth + MFA Support</h4><p>Google/GitHub OAuth, email/password with verified sessions, and multi-factor authentication — planned for all plans.</p></div></div>
-        <div class="si fu" style="transition-delay:.05s"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg></div><div><h4>Execution Environment Isolation</h4><p>Frontend and execution workers run in fully separate environments. The UI has no direct broker access — ever.</p></div></div>
-        <div class="si fu" style="transition-delay:.1s"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div><h4>Immutable Incident Log</h4><p>Every operator action, system event, and rule evaluation is written to an append-only log — no modification, full reconstruction.</p></div></div>
-        <div class="si fu" style="transition-delay:.15s"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><h4>Role-Based Access Control</h4><p>Admin, operator, and viewer roles — scoped to accounts, strategies, or the full environment depending on plan tier.</p></div></div>
+        <div class="si fu"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><h4>Supabase Auth + MFA Support</h4><p>Google/GitHub OAuth, email/password with verified sessions, and multi-factor authentication.</p></div></div>
+        <div class="si fu" style="transition-delay:.05s"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg></div><div><h4>Execution Environment Isolation</h4><p>Frontend and execution workers run in fully separate environments. The UI has no direct broker access.</p></div></div>
+        <div class="si fu" style="transition-delay:.1s"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div><h4>Immutable Incident Log</h4><p>Every operator action, system event, and rule evaluation is written to an append-only log.</p></div></div>
+        <div class="si fu" style="transition-delay:.15s"><div class="sic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><h4>Role-Based Access Control</h4><p>Admin, operator, and viewer roles — scoped to accounts, strategies, or the full environment.</p></div></div>
       </div>
       <div class="sv fu" style="transition-delay:.1s">
         <div class="svt">Security Architecture Layers</div>
@@ -786,7 +837,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
         <div class="sly l4"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>Isolated VPS · Execution Workers · Broker API</div>
         <div style="margin-top:20px;padding:14px;background:var(--bg3);border-radius:var(--rs);border:1px solid var(--b1)">
           <div style="font-size:11px;font-weight:600;margin-bottom:5px;color:var(--ac)">Design Principles</div>
-          <div style="font-size:11px;color:var(--t2);line-height:1.7">Defense in depth · Least privilege · Environment isolation · Encrypted at rest and in transit · Immutable logs · Separate control and data planes · No direct UI-to-broker path</div>
+          <div style="font-size:11px;color:var(--t2);line-height:1.7">Defense in depth · Least privilege · Environment isolation · Encrypted at rest and in transit · Immutable logs · Separate control and data planes</div>
         </div>
       </div>
     </div>
@@ -797,13 +848,13 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ── ARCHITECTURE ───────────────────────────────────────── -->
 <section class="sec" id="architecture">
   <div class="ctn">
-    <div class="fu"><span class="sl">Technical Architecture</span><h2 class="st">Built for Production. Designed to Scale.</h2><p class="ss">A modern, modular stack with each layer independently deployable — optimized for reliability, low-latency execution feedback, and operational growth.</p></div>
+    <div class="fu"><span class="sl">Technical Architecture</span><h2 class="st">Built for Production. Designed to Scale.</h2><p class="ss">A modern, modular stack with each layer independently deployable — optimized for reliability and low-latency execution feedback.</p></div>
     <div class="ag">
       <div class="agc fu"><div class="agl">Frontend</div><h3>React 19 + Vite</h3><p>TypeScript-first operator console with fast builds, real-time data, and a component architecture built for extension.</p><div class="agt"><span class="tg tb">React 19</span><span class="tg tb">Vite</span><span class="tg tb">TypeScript</span></div></div>
       <div class="agc fu" style="transition-delay:.05s"><div class="agl">Auth & Data</div><h3>Supabase</h3><p>Managed PostgreSQL, real-time subscriptions, row-level security, and Google/GitHub OAuth out of the box.</p><div class="agt"><span class="tg tp">OAuth</span><span class="tg tp">RLS</span><span class="tg tp">Realtime</span></div></div>
       <div class="agc fu" style="transition-delay:.1s"><div class="agl">Hosting</div><h3>Vercel Edge</h3><p>Global edge deployment with automatic SSL, CI/CD pipeline, and zero-config preview environments.</p><div class="agt"><span class="tg tgr">Edge CDN</span><span class="tg tgr">Auto SSL</span></div></div>
       <div class="agc fu" style="transition-delay:.15s"><div class="agl">Backend API</div><h3>Python FastAPI</h3><p>Async API server handling command routing, risk rule evaluation, and WebSocket state broadcasting.</p><div class="agt"><span class="tg tb">Async</span><span class="tg tb">WebSocket</span><span class="tg tb">REST</span></div></div>
-      <div class="agc fu" style="transition-delay:.2s"><div class="agl">Execution Layer</div><h3>Isolated Workers</h3><p>Python-based execution workers on dedicated VPS — isolated from API and frontend, connected directly to broker interfaces.</p><div class="agt"><span class="tg tp">Isolated</span><span class="tg tp">VPS</span><span class="tg tp">MT4/5</span></div></div>
+      <div class="agc fu" style="transition-delay:.2s"><div class="agl">Execution Layer</div><h3>Isolated Workers</h3><p>Python-based execution workers on dedicated VPS — isolated from API and frontend, connected to broker interfaces.</p><div class="agt"><span class="tg tp">Isolated</span><span class="tg tp">VPS</span><span class="tg tp">MT4/5</span></div></div>
       <div class="agc fu" style="transition-delay:.25s"><div class="agl">Infrastructure</div><h3>Cloud VM + Monitoring</h3><p>Automated provisioning, health checks, structured log aggregation, and uptime alerting across all layers.</p><div class="agt"><span class="tg tgr">HA</span><span class="tg tgr">Log Agg</span><span class="tg tgr">Alerts</span></div></div>
     </div>
   </div>
@@ -813,16 +864,16 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 <!-- ── RISK ENGINE ────────────────────────────────────────── -->
 <section class="sec" id="risk">
   <div class="ctn">
-    <div class="fu"><span class="sl">Risk Engine</span><h2 class="st">Capital Protection as a First-Class Feature.</h2><p class="ss">Every order is evaluated against your configured risk rules before it reaches the broker. No exceptions. No overrides without operator action.</p></div>
+    <div class="fu"><span class="sl">Risk Engine</span><h2 class="st">Capital Protection as a First-Class Feature.</h2><p class="ss">Every order is evaluated against your configured risk rules before it reaches the broker. No exceptions.</p></div>
     <div class="rg">
       <div class="rl2">
-        <div class="ri fu"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div><h4>Drawdown Guard</h4><p>Auto-pause active EAs when daily or session drawdown reaches your configured threshold — before damage compounds.</p></div></div>
-        <div class="ri fu" style="transition-delay:.05s"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></div><div><h4>Daily Loss Ceiling</h4><p>Hard stop at your configured maximum daily loss — automatic suspension with operator notification and incident log entry.</p></div></div>
-        <div class="ri fu" style="transition-delay:.1s"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><h4>Pre-Trade Rule Engine</h4><p>Evaluate every order against position sizing limits, maximum concurrent exposure, time-of-day restrictions, and correlation rules — all configurable per strategy.</p></div></div>
-        <div class="ri fu" style="transition-delay:.15s"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/></svg></div><div><h4>Emergency Kill Switch</h4><p>One operator action — stops all execution across all connected broker accounts instantly. Designed for adverse conditions, not routine use.</p></div></div>
+        <div class="ri fu"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div><h4>Drawdown Guard</h4><p>Auto-pause active strategies when daily or session drawdown reaches your configured threshold.</p></div></div>
+        <div class="ri fu" style="transition-delay:.05s"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></div><div><h4>Daily Loss Ceiling</h4><p>Hard stop at your configured maximum daily loss — automatic suspension with operator notification.</p></div></div>
+        <div class="ri fu" style="transition-delay:.1s"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><h4>Pre-Trade Rule Engine</h4><p>Evaluate every order against position sizing limits, maximum concurrent exposure, and correlation rules.</p></div></div>
+        <div class="ri fu" style="transition-delay:.15s"><div class="ric"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/></svg></div><div><h4>Emergency Kill Switch</h4><p>One operator action — stops all execution across all connected broker accounts instantly.</p></div></div>
       </div>
       <div class="rv fu" style="transition-delay:.1s">
-        <div style="font-family:var(--mo);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:16px;font-weight:500">Risk Dashboard — Example Configuration</div>
+        <div style="font-family:var(--mo);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:16px;font-weight:500">Risk Dashboard — Example</div>
         <div class="rmtr"><div class="rmh"><span>Daily Drawdown</span><span style="color:var(--g)">2.1% / 5.0% limit</span></div><div class="rmb"><div class="rmf" style="background:var(--g);width:28%"></div></div></div>
         <div class="rmtr"><div class="rmh"><span>Weekly Exposure</span><span style="color:var(--am)">67% / 100% limit</span></div><div class="rmb"><div class="rmf" style="background:var(--am);width:55%"></div></div></div>
         <div class="rmtr"><div class="rmh"><span>Correlation Risk</span><span style="color:var(--r)">High — action advised</span></div><div class="rmb"><div class="rmf" style="background:var(--r);width:82%"></div></div></div>
@@ -830,10 +881,6 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
           <div style="padding:10px;border-radius:var(--rs);text-align:center;background:var(--gd);border:1px solid rgba(52,211,153,.12)"><div style="font-size:10px;color:var(--t3)">Kill Switch</div><div style="font-size:13px;font-weight:700;color:var(--g)">ARMED</div></div>
           <div style="padding:10px;border-radius:var(--rs);text-align:center;background:var(--gd);border:1px solid rgba(52,211,153,.12)"><div style="font-size:10px;color:var(--t3)">Guards</div><div style="font-size:13px;font-weight:700;color:var(--g)">ALL ACTIVE</div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--rs);background:var(--rd);border:1px solid rgba(248,113,113,.15);margin-top:14px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--r)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-          <p style="font-size:11px;color:var(--r);font-weight:500">Correlation alert: EURUSD + GBPUSD positions exceed 0.85 correlation threshold.</p>
         </div>
       </div>
     </div>
@@ -847,57 +894,41 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <div class="fu"><span class="sl">Mobile Operator Experience</span><h2 class="st">Console Access. Anywhere.</h2><p class="ss">A responsive, app-quality mobile experience with bottom navigation, floating action controls, and touch-optimized incident panels.</p></div>
     <div class="mg">
       <div class="mfl">
-        <div class="mf fu"><div class="mfic" style="background:var(--acd);color:var(--ac)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div><div><h4>Bottom Navigation</h4><p>Thumb-friendly nav: Console, EAs, Risk, Alerts, More.</p></div></div>
-        <div class="mf fu" style="transition-delay:.05s"><div class="mfic" style="background:var(--acd);color:var(--ac)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/></svg></div><div><h4>FAB: Emergency Controls</h4><p>Floating action button surfaces kill switch, pause-all, and incident log — one tap from any screen.</p></div></div>
+        <div class="mf fu"><div class="mfic" style="background:var(--acd);color:var(--ac)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div><div><h4>Bottom Navigation</h4><p>Thumb-friendly nav: Console, Strategies, Risk, Alerts, More.</p></div></div>
+        <div class="mf fu" style="transition-delay:.05s"><div class="mfic" style="background:var(--acd);color:var(--ac)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><h4>Quick Contact</h4><p>WhatsApp & Telegram support — reach our team or AI assistant instantly from any screen.</p></div></div>
         <div class="mf fu" style="transition-delay:.1s"><div class="mfic" style="background:var(--gd);color:var(--g)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div><div><h4>Incident Cards</h4><p>Mobile-optimized incident panels with severity, context, and one-tap acknowledgment.</p></div></div>
-        <div class="mf fu" style="transition-delay:.15s"><div class="mfic" style="background:var(--rd);color:var(--r)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div><div><h4>Critical Push Alerts</h4><p>High-severity risk events surface as push notifications — operators never miss a drawdown breach or kill-switch trigger.</p></div></div>
+        <div class="mf fu" style="transition-delay:.15s"><div class="mfic" style="background:var(--rd);color:var(--r)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div><div><h4>Critical Push Alerts</h4><p>High-severity risk events surface as push notifications — never miss a drawdown breach.</p></div></div>
       </div>
       <div class="fu" style="transition-delay:.1s;display:flex;justify-content:center">
-        <div class="ph"><div class="phn"></div><div class="phs"><div class="phc"><div style="font-size:10px;font-weight:700;margin-bottom:8px">Avoryn Console</div><div class="phmc"><div class="phml"></div><div class="phmv" style="background:var(--acd)"></div></div><div class="phmc"><div class="phml" style="width:35%"></div><div class="phmv" style="width:45%;background:var(--gd)"></div></div><div class="phmc"><div class="phml" style="width:50%"></div><div class="phmv" style="width:40%;background:var(--rd)"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px"><div style="height:34px;background:var(--bg3);border:1px solid var(--b1);border-radius:5px"></div><div style="height:34px;background:var(--bg3);border:1px solid var(--b1);border-radius:5px"></div></div></div><div class="phbn"><div class="phfb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/></svg></div><div class="phni"><div class="phnd on"></div><span class="phnl">Console</span></div><div class="phni"><div class="phnd"></div><span class="phnl">EAs</span></div><div class="phni" style="width:30px"></div><div class="phni"><div class="phnd"></div><span class="phnl">Risk</span></div><div class="phni"><div class="phnd"></div><span class="phnl">More</span></div></div></div></div>
+        <div class="ph"><div class="phn"></div><div class="phs"><div class="phc"><div style="font-size:10px;font-weight:700;margin-bottom:8px">Oqvara Console</div><div class="phmc"><div class="phml"></div><div class="phmv" style="background:var(--acd)"></div></div><div class="phmc"><div class="phml" style="width:35%"></div><div class="phmv" style="width:45%;background:var(--gd)"></div></div><div class="phmc"><div class="phml" style="width:50%"></div><div class="phmv" style="width:40%;background:var(--rd)"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px"><div style="height:34px;background:var(--bg3);border:1px solid var(--b1);border-radius:5px"></div><div style="height:34px;background:var(--bg3);border:1px solid var(--b1);border-radius:5px"></div></div></div><div class="phbn"><div class="phfb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="phni"><div class="phnd on"></div><span class="phnl">Console</span></div><div class="phni"><div class="phnd"></div><span class="phnl">Strats</span></div><div class="phni" style="width:30px"></div><div class="phni"><div class="phnd"></div><span class="phnl">Risk</span></div><div class="phni"><div class="phnd"></div><span class="phnl">More</span></div></div></div></div>
       </div>
-    </div>
-  </div>
-</section>
-<div class="dl"></div>
-
-<!-- ── ROADMAP ────────────────────────────────────────────── -->
-<section class="sec" id="roadmap">
-  <div class="ctn">
-    <div class="fu"><span class="sl">Development Roadmap</span><h2 class="st">Staged. Disciplined. Production-Ready.</h2><p class="ss">Phased delivery prioritizing core supervision functionality, security, and operational stability before extending capabilities.</p></div>
-    <div class="rmt fu">
-      <div class="rmi"><div class="rmd now"></div><div class="rmp">Phase 1</div><h4>Prototype</h4><p>Product positioning, brand foundation, architecture blueprint.</p></div>
-      <div class="rmi"><div class="rmd"></div><div class="rmp">Phase 2</div><h4>Auth & Foundation</h4><p>Supabase auth, scaffold, CI/CD pipeline, operator UI shell.</p></div>
-      <div class="rmi"><div class="rmd"></div><div class="rmp">Phase 3</div><h4>Console & Monitoring</h4><p>Operator console, real-time EA status, execution feed.</p></div>
-      <div class="rmi"><div class="rmd"></div><div class="rmp">Phase 4</div><h4>Broker Integration</h4><p>MT4/5 bridge, Python workers, order routing, live accounts.</p></div>
-      <div class="rmi"><div class="rmd"></div><div class="rmp">Phase 5</div><h4>Risk Engine</h4><p>Full pre-trade rules, drawdown guard, kill switch, incident log.</p></div>
-      <div class="rmi"><div class="rmd"></div><div class="rmp">Phase 6</div><h4>AI Review</h4><p>LLM-assisted session analysis, anomaly explanation, audit narration.</p></div>
-      <div class="rmi"><div class="rmd"></div><div class="rmp">Phase 7</div><h4>Multi-Account & Teams</h4><p>Institutional RBAC, team management, custom rule authoring, SLA.</p></div>
     </div>
   </div>
 </section>
 <div class="dl"></div>
 
 <!-- ── FOOTER ─────────────────────────────────────────────── -->
-<footer class="ft">
+<footer class="site-footer">
   <div class="ctn">
     <div class="ftg">
       <div class="ftbr">
         <a href="#" class="logo" onclick="showPage('landing');return false;">
-          <svg class="nav-logo-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path class="logo-svg-arc" d="M38 10 A20 20 0 1 1 10 38" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-            <path class="logo-svg-text" d="M14.5 35 L24 13 L33.5 35" stroke="#e4e9f2" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <path class="logo-svg-crossbar" d="M18.2 27 H29.8" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+          <svg class="nav-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="oqv-arc" d="M38 24 A14 14 0 1 0 24 38" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+            <circle class="oqv-ring" cx="24" cy="24" r="5.5" stroke-width="1.8" fill="none" stroke-opacity="0.55"/>
+            <path class="oqv-tail" d="M27.9 27.9 L34 34" stroke-width="2.6" stroke-linecap="round"/>
+            <circle class="oqv-dot" cx="35.2" cy="35.2" r="1.4"/>
           </svg>
-          Avoryn
+          Oqvara
         </a>
         <p>Operator-grade execution supervision for live automated trading. Risk-aware. Broker-connected. Audit-ready.</p>
       </div>
       <div class="ftc"><h4>Platform</h4><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#security">Security</a><a href="#risk">Risk Engine</a></div>
-      <div class="ftc"><h4>Technical</h4><a href="#architecture">Architecture</a><a href="#roadmap">Roadmap</a><a href="#">API Docs (Soon)</a><a href="#">Status (Soon)</a></div>
+      <div class="ftc"><h4>Technical</h4><a href="#architecture">Architecture</a><a href="#">API Docs (Soon)</a><a href="#">Status (Soon)</a></div>
       <div class="ftc"><h4>Company</h4><a href="#whoisitfor">Who It's For</a><a href="#">Contact</a><a href="#">Security Policy</a><a href="#">Terms (Soon)</a></div>
     </div>
     <div class="ftb">
-      <p>© 2026 Avoryn. Operator-grade execution supervision.</p>
+      <p>© 2026 Oqvara. Operator-grade execution supervision.</p>
       <div class="ftbs"><span class="ftbd">React 19</span><span class="ftbd">Vite</span><span class="ftbd">Supabase</span><span class="ftbd">FastAPI</span><span class="ftbd">MT4/5</span></div>
     </div>
   </div>
@@ -905,25 +936,63 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 
 </div><!-- /page-landing -->
 
-<!-- ═══════════════════════════════════════════════════════ MOBILE NAV -->
+<!-- ═══════════════════════════════════════════════════════ MOBILE NAV — 5 items preserved -->
 <nav class="mn" id="mN">
   <a href="#hero" class="mni act" data-s="hero" onclick="showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Console</a>
-  <a href="#features" class="mni" data-s="features" onclick="showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>EAs</a>
+  <a href="#features" class="mni" data-s="features" onclick="showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Strats</a>
   <a href="#pricing" class="mni" data-s="pricing" onclick="showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Plans</a>
   <a href="#risk" class="mni" data-s="risk" onclick="showPage('landing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Risk</a>
-  <a href="#" class="mni" onclick="openMore();return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>More</a>
+  <a href="#" class="mni" id="moreBtn" onclick="toggleMore();return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>More</a>
 </nav>
 
-<button class="mfab" id="mF" aria-label="Operator Quick Actions">
-  <svg class="fab-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/></svg>
+<!-- MOBILE FAB — Contact & AI Chat Hub -->
+<button class="mfab" id="mF" aria-label="Contact & Chat" onclick="toggleSocialFab()">
+  <!-- Chat bubble icon (generic) -->
+  <svg class="fab-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <svg class="fab-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M18 6L6 18M6 6l12 12"/></svg>
 </button>
 
-<!-- FAB POPUP MENU -->
-<div class="fab-menu" id="fabMenu">
-  <a class="fab-item danger" onclick="fabAction('kill')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><path d="M12 8v4M12 16h.01"/></svg>Emergency Stop</a>
-  <a class="fab-item" onclick="fabAction('pause')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause All EAs</a>
-  <a class="fab-item" onclick="fabAction('incidents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Incident Feed</a>
-  <a class="fab-item" onclick="fabAction('audit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Audit Log</a>
+<!-- Social FAB Menu -->
+<div class="social-fab-menu" id="socialFabMenu">
+  <a class="social-fab-item ai-bot" onclick="openAiChat();closeSocialFab();return false;" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 2a3 3 0 0 0-3 3v1H6a2 2 0 0 0-2 2v2a2 2 0 0 0 1 1.73V17a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-5.27A2 2 0 0 0 20 10V8a2 2 0 0 0-2-2h-3V5a3 3 0 0 0-3-3z"/><circle cx="9" cy="11" r="1" fill="currentColor"/><circle cx="15" cy="11" r="1" fill="currentColor"/><path d="M9 15c.6.9 1.6 1.5 3 1.5s2.4-.6 3-1.5"/></svg>
+    Oqvara AI Assistant
+    <span class="ai-pulse"></span>
+  </a>
+  <a class="social-fab-item wa" href="https://wa.me/6281234567890" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Chat via WhatsApp
+  </a>
+  <a class="social-fab-item tg2" href="https://t.me/oqvara_support" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    Chat via Telegram
+  </a>
+  <a class="social-fab-item email-fab" href="mailto:support@oqvara.com">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    Email Support
+  </a>
+</div>
+
+<!-- AI CHATBOT PANEL -->
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="chat-head-avatar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1H6a2 2 0 0 0-2 2v2a2 2 0 0 0 1 1.73V17a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-5.27A2 2 0 0 0 20 10V8a2 2 0 0 0-2-2h-3V5a3 3 0 0 0-3-3z"/><circle cx="9" cy="11" r="1" fill="currentColor"/><circle cx="15" cy="11" r="1" fill="currentColor"/></svg>
+    </div>
+    <div class="chat-head-info">
+      <div class="chat-head-name">Oqvara AI Assistant</div>
+      <div class="chat-head-status">Online · Trading & Market Intel</div>
+    </div>
+    <button class="chat-close" onclick="closeAiChat()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot">Hey there! I'm Oqvara's AI assistant. Ask me anything about forex markets, trading strategies, EA bots, market news, or how Oqvara can help your trading operations. What's on your mind? 🤖📈</div>
+  </div>
+  <div class="chat-disclaimer">AI-powered · Responses may not be 100% accurate · Not financial advice</div>
+  <div class="chat-input-area">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Ask about markets, trading, EA bots..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" id="chatSendBtn" onclick="sendChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+  </div>
 </div>
 
 <script>
@@ -931,10 +1000,26 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 function showPage(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   const t=document.getElementById('page-'+p);
-  if(t){t.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>t.querySelectorAll('.fu').forEach(e=>obs.observe(e)),100);closeFab()}
+  if(t){t.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>t.querySelectorAll('.fu').forEach(e=>obs.observe(e)),100);closeSocialFab();closeMore();closeAiChat()}
 }
-function openMore(){document.getElementById('moreMenu').classList.add('open');document.body.classList.add('noscr')}
-function closeMore(){document.getElementById('moreMenu').classList.remove('open');document.body.classList.remove('noscr')}
+
+// ── MORE MENU (compact bottom sheet)
+let moreOpen=false;
+function toggleMore(){
+  if(moreOpen){closeMore()}else{openMore()}
+}
+function openMore(){
+  moreOpen=true;
+  document.getElementById('moreSheet').classList.add('open');
+  document.getElementById('moreBackdrop').classList.add('open');
+  document.getElementById('moreBtn').classList.add('act');
+}
+function closeMore(){
+  moreOpen=false;
+  document.getElementById('moreSheet').classList.remove('open');
+  document.getElementById('moreBackdrop').classList.remove('open');
+  document.getElementById('moreBtn').classList.remove('act');
+}
 
 // ── PASSWORD TOGGLE
 function tp(id,b){
@@ -962,36 +1047,180 @@ function handleReg(e){e.preventDefault();alert('Registration prototype — In pr
 // ── THEME TOGGLE
 function toggleTheme(){
   document.body.classList.toggle('light');
-  localStorage.setItem('avoryn-theme',document.body.classList.contains('light')?'light':'dark');
+  localStorage.setItem('oqvara-theme',document.body.classList.contains('light')?'light':'dark');
 }
-(function(){if(localStorage.getItem('avoryn-theme')==='light')document.body.classList.add('light')})();
+(function(){if(localStorage.getItem('oqvara-theme')==='light')document.body.classList.add('light')})();
 
-// ── FAB MENU
-let fabOpen=false;
-const fabBtn=document.getElementById('mF');
-const fabMenu=document.getElementById('fabMenu');
-function closeFab(){
-  fabOpen=false;
-  if(fabMenu)fabMenu.classList.remove('open');
-  if(fabBtn){fabBtn.querySelector('.fab-plus').style.transform='';fabBtn.style.background=''}
+// ── SOCIAL FAB (generic chat hub)
+let socialFabOpen=false;
+const socialFabBtn=document.getElementById('mF');
+const socialFabMenu=document.getElementById('socialFabMenu');
+function closeSocialFab(){
+  socialFabOpen=false;
+  if(socialFabMenu)socialFabMenu.classList.remove('open');
+  if(socialFabBtn){
+    socialFabBtn.querySelector('.fab-icon-default').style.display='';
+    socialFabBtn.querySelector('.fab-icon-close').style.display='none';
+    socialFabBtn.classList.remove('chat-open');
+  }
 }
-function openFab(){
-  fabOpen=true;
-  if(fabMenu)fabMenu.classList.add('open');
-  if(fabBtn){fabBtn.querySelector('.fab-plus').style.transform='rotate(45deg)';fabBtn.style.background='var(--r)'}
+function openSocialFab(){
+  socialFabOpen=true;
+  if(socialFabMenu)socialFabMenu.classList.add('open');
+  if(socialFabBtn){
+    socialFabBtn.querySelector('.fab-icon-default').style.display='none';
+    socialFabBtn.querySelector('.fab-icon-close').style.display='';
+    socialFabBtn.classList.add('chat-open');
+  }
 }
-if(fabBtn)fabBtn.addEventListener('click',function(e){e.stopPropagation();if(fabOpen){closeFab()}else{openFab()}});
-function fabAction(type){
-  closeFab();
-  const msgs={
-    kill:'Emergency Kill Switch — In production: immediately stops all active execution across all connected broker accounts. Positions are NOT automatically closed; halts only new order routing. Confirmation required.',
-    pause:'Pause All EAs — In production: sends pause signal to all active EAs simultaneously. Orders in flight may still fill. Resume available per-EA or globally from the console.',
-    incidents:'Incident Feed — In production: opens the live alert panel with full event history, severity filter, acknowledgment state, and escalation status.',
-    audit:'Audit Log — In production: opens the immutable incident log with timeline view, actor attribution, full event context, and structured export for review or compliance purposes.'
-  };
-  alert(msgs[type]||'Action prototype');
+function toggleSocialFab(){
+  if(socialFabOpen){closeSocialFab()}else{openSocialFab()}
 }
-document.addEventListener('click',function(e){if(fabOpen&&!fabBtn.contains(e.target)&&!fabMenu.contains(e.target))closeFab()});
+document.addEventListener('click',function(e){
+  if(socialFabOpen&&socialFabBtn&&socialFabMenu&&!socialFabBtn.contains(e.target)&&!socialFabMenu.contains(e.target))closeSocialFab();
+});
+
+// ── AI CHATBOT
+const chatPanel=document.getElementById('chatPanel');
+const chatMessages=document.getElementById('chatMessages');
+const chatInput=document.getElementById('chatInput');
+const chatSendBtn=document.getElementById('chatSendBtn');
+let chatHistory=[];
+let chatBusy=false;
+
+function openAiChat(){
+  if(chatPanel){chatPanel.classList.add('open');chatInput.focus()}
+}
+function closeAiChat(){
+  if(chatPanel)chatPanel.classList.remove('open');
+}
+
+function addMsg(text,role){
+  const d=document.createElement('div');
+  d.className='chat-msg '+(role==='user'?'user':'bot');
+  d.textContent=text;
+  chatMessages.appendChild(d);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+  return d;
+}
+function addTyping(){
+  const d=document.createElement('div');
+  d.className='chat-msg bot typing';
+  d.id='typingIndicator';
+  d.innerHTML='<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  chatMessages.appendChild(d);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+  return d;
+}
+function removeTyping(){
+  const t=document.getElementById('typingIndicator');
+  if(t)t.remove();
+}
+
+// Topic detection & funny redirects
+const FUNNY_REDIRECTS=[
+  "Wah, saya cuma jago soal trading dan market nih! Coba tanya soal XAUUSD atau strategi EA, pasti saya semangat jawabnya! 😄📊",
+  "Hmm, itu di luar keahlian saya... Tapi kalau mau bahas analisa market atau cara setup EA bot, saya siap 24/7! 🤖💹",
+  "Haha, saya AI trading assistant, bukan Google! 😂 Tapi serius, tanya apa aja soal forex, gold, EA, atau robot trading — itu spesialisasi saya!",
+  "Waduh, saya nggak bisa bantu soal itu. Tapi kalau mau tahu kenapa EURUSD turun atau gimana cara bikin EA yang profitable, langsung tanya aja! 📈🔥",
+  "Saya cuma ngerti soal candle, pip, dan lot — bukan itu! 😅 Yuk tanya seputar trading, market news, atau strategi bot!",
+  "That's outside my trading radar! 🎯 But ask me about market trends, EA strategies, risk management, or pair analysis and I'll light up!"
+];
+
+const TRADING_KEYWORDS=['trading','trade','forex','market','xauusd','eurusd','gbpusd','usdjpy','gold','silver','xagusd','ea','expert advisor','bot','robot','metatrader','mt4','mt5','strategy','strategi','indicator','indikator','pip','lot','spread','leverage','margin','drawdown','risk','candlestick','candle','support','resistance','trend','bullish','bearish','breakout','scalping','swing','signal','analisa','analysis','pair','currency','mata uang','broker','order','buy','sell','long','short','profit','loss','stop loss','take profit','trailing','hedge','korelasi','correlation','volatility','volatilitas','news','berita','nfp','fomc','fed','ecb','boj','inflation','inflasi','interest rate','suku bunga','gdp','unemployment','cpi','pmi','economic','ekonomi','chart','grafik','timeframe','moving average','rsi','macd','bollinger','fibonacci','stochastic','ema','sma','oqvara','platform','pricing','harga','plan','subscription','fitur','feature','risk engine','kill switch','audit','monitoring','supervision','execution','command','incident','nas100','us30','btcusd','crypto','bitcoin','commodity','oil','wti','index','indices','saham','stock','dow','nasdaq'];
+
+function isTrading(text){
+  const lower=text.toLowerCase();
+  return TRADING_KEYWORDS.some(k=>lower.includes(k));
+}
+
+async function sendChat(){
+  if(chatBusy)return;
+  const msg=chatInput.value.trim();
+  if(!msg)return;
+  
+  chatInput.value='';
+  addMsg(msg,'user');
+  chatBusy=true;
+  chatSendBtn.disabled=true;
+  
+  // Check if it's trading-related
+  if(!isTrading(msg)){
+    addTyping();
+    await new Promise(r=>setTimeout(r,800+Math.random()*700));
+    removeTyping();
+    const funny=FUNNY_REDIRECTS[Math.floor(Math.random()*FUNNY_REDIRECTS.length)];
+    addMsg(funny,'bot');
+    chatBusy=false;
+    chatSendBtn.disabled=false;
+    chatInput.focus();
+    return;
+  }
+  
+  // Trading related — call Anthropic API
+  chatHistory.push({role:'user',content:msg});
+  addTyping();
+  
+  try{
+    const systemPrompt=`You are Oqvara AI Assistant — a specialized trading and market intelligence chatbot embedded in the Oqvara execution supervision platform landing page.
+
+YOUR EXPERTISE:
+- Forex, metals (XAUUSD, XAGUSD), indices, commodities, crypto CFDs
+- Expert Advisors (EA), trading bots, MetaTrader 4/5
+- Market analysis, technical analysis, fundamental analysis
+- Trading strategies: scalping, swing trading, trend following, mean reversion
+- Risk management, position sizing, drawdown protection
+- Market news and economic events (NFP, FOMC, CPI, etc.)
+- Oqvara platform features: risk engine, kill switch, audit trail, monitoring
+
+BEHAVIOR RULES:
+1. Always respond in the SAME LANGUAGE the user writes in (Indonesian/English/etc)
+2. Keep responses concise (2-4 short paragraphs max) — this is a chat widget, not an essay
+3. Be friendly, knowledgeable, and slightly witty
+4. Use relevant emojis sparingly (1-3 per message)
+5. Include specific data points, pair names, or technical terms when relevant
+6. If asked about real-time prices, mention you don't have live feeds but can discuss recent trends and suggest checking a live chart
+7. Always add a disclaimer if giving market analysis: "Bukan saran finansial" or "Not financial advice"
+8. If someone asks about Oqvara specifically, enthusiastically explain the platform's features
+9. Never make guaranteed profit claims
+10. Be helpful and encourage good trading practices (risk management, testing on demo first, etc.)`;
+
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        system:systemPrompt,
+        messages:chatHistory.slice(-10),
+        tools:[{type:'web_search_20250305',name:'web_search'}]
+      })
+    });
+    
+    const data=await resp.json();
+    removeTyping();
+    
+    if(data.content){
+      const texts=data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+      if(texts){
+        addMsg(texts,'bot');
+        chatHistory.push({role:'assistant',content:texts});
+      } else {
+        addMsg("Hmm, saya perlu coba lagi. Bisa ulangi pertanyaannya? 🤔",'bot');
+      }
+    } else {
+      addMsg("Waduh, ada gangguan teknis nih. Coba tanya lagi ya! 🔧",'bot');
+    }
+  } catch(err){
+    removeTyping();
+    console.error('Chat error:',err);
+    addMsg("Oops, koneksi ke server lagi bermasalah. Coba lagi dalam beberapa detik ya! 🔄",'bot');
+  }
+  
+  chatBusy=false;
+  chatSendBtn.disabled=false;
+  chatInput.focus();
+}
 
 // ── SCROLL OBSERVER
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
